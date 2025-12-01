@@ -33,31 +33,31 @@
     {
       "id": "client-truck",
       "description": "Truck Logistic logo",
-      "imageUrl": "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHx0cnVjayUyMGxvZ298ZW58MHx8fHwxNzY1MzA1NzA5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "/truck.jpg",
       "imageHint": "truck logo"
     },
     {
       "id": "client-speedlog",
       "description": "SpeedLog logo",
-      "imageUrl": "https://images.unsplash.com/photo-1496200186974-4293800e2c20?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxjb21wYW55JTIwbG9nb3xlbnwwfHx8fDE3NjQ2MTk5OTV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "/speedlog.jpg",
       "imageHint": "company logo"
     },
     {
       "id": "client-boxtruck",
       "description": "Boxtruck Logistics logo",
-      "imageUrl": "https://images.unsplash.com/photo-1562783912-21ad31ee2a83?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjb21wYW55JTIwbG9nb3xlbnwwfHx8fDE3NjQ2MTk5OTV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "/boxtruck.jpg",
       "imageHint": "company logo"
     },
     {
       "id": "client-rodonaves",
       "description": "Rodonaves logo",
-      "imageUrl": "https://images.unsplash.com/photo-1562783912-21ad31ee2a83?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjb21wYW55JTIwbG9nb3xlbnwwfHx8fDE3NjQ2MTk5OTV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "/rodonaves.jpg",
       "imageHint": "company logo"
     },
     {
       "id": "client-grana",
       "description": "Grana Transportes logo",
-      "imageUrl": "https://images.unsplash.com/photo-1687523327554-fa9f50423489?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxjb21wYW55JTIwbG9nb3xlbnwwfHx8fDE3NjQ2MTk5OTV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "/grana.jpg",
       "imageHint": "company logo"
     }
   ]
