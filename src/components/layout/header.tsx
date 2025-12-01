@@ -33,9 +33,9 @@ export function Header() {
   return (
     <header className={cn(
         "fixed top-0 z-50 w-full transition-all duration-300",
-        isScrolled ? "border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" : "bg-transparent border-b border-transparent"
+        isScrolled ? "border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" : "bg-transparent"
     )}>
-      <div className="container flex h-14 max-w-screen-2xl items-center">
+      <div className="container mx-auto px-4 flex h-14 items-center">
         <div className="mr-4 flex">
           <Link href="/" className="mr-6 flex items-center space-x-2">
             <CarLockLogo className={cn("h-6 w-6", isScrolled ? "text-primary" : "text-white")} />
