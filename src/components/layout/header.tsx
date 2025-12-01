@@ -36,12 +36,15 @@ export function Header() {
         "fixed top-0 z-50 w-full transition-all duration-300",
         isScrolled ? "border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" : "bg-transparent"
     )}>
-      <div className="container mx-auto px-4 flex h-14 items-center">
-        <div className="mr-4 flex">
-          <Link href="/" className="mr-6 flex items-center space-x-2">
+      <div className="container mx-auto px-4 flex h-14 items-center justify-between">
+        <div className="flex items-center">
+          <Link href="/" className="flex items-center space-x-2">
             <CarLockLogo className={cn("h-6 w-6", isScrolled ? "text-primary" : "text-white")} />
             <span className={cn("font-bold", isScrolled ? "text-foreground" : "text-white")}>CarLock</span>
           </Link>
+        </div>
+        
+        <div className="flex items-center gap-6">
           <nav className="hidden gap-6 md:flex">
             {navLinks.map((link) => (
               <Link
@@ -56,8 +59,7 @@ export function Header() {
               </Link>
             ))}
           </nav>
-        </div>
-        <div className="flex flex-1 items-center justify-end space-x-2">
+          
           <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
             <SheetTrigger asChild>
               <Button
