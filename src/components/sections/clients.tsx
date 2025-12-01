@@ -59,7 +59,7 @@ export function Clients() {
                     alt={logo.description}
                     width={160}
                     height={80}
-                    className="object-contain aspect-[2/1] grayscale opacity-60 transition-all hover:grayscale-0 hover:opacity-100"
+                    className="object-contain aspect-[2/1]"
                     data-ai-hint={logo.imageHint}
                   />
                 </div>
