@@ -15,7 +15,7 @@ export function Clients() {
   const logos = clientLogoIds.map(id => imageMap.get(id)).filter(Boolean);
   
   // Duplicate logos for a seamless loop
-  const duplicatedLogos = [...logos, ...logos];
+  const duplicatedLogos = [...logos, ...logos, ...logos, ...logos];
 
   return (
     <section id="clients" className="py-16 sm:py-24 bg-muted/40">
