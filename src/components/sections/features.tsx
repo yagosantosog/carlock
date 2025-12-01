@@ -49,23 +49,8 @@ export function Features() {
     <section id="features" className="py-16 sm:py-24 bg-white">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Image Column */}
-          <div className="flex justify-center p-8">
-            <div className="relative aspect-square w-full max-w-md">
-              {featuresImage && (
-                <Image
-                  src={featuresImage.imageUrl}
-                  alt={featuresImage.description}
-                  fill
-                  className="rounded-lg object-cover"
-                  data-ai-hint={featuresImage.imageHint}
-                />
-              )}
-            </div>
-          </div>
-
           {/* Content Column */}
-          <div>
+          <div className="lg:order-last">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl font-headline">
               Tudo que você precisa para sua segurança
             </h2>
@@ -84,6 +69,20 @@ export function Features() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+          {/* Image Column */}
+          <div className="flex justify-center p-8 lg:order-first">
+            <div className="relative aspect-square w-full max-w-md">
+              {featuresImage && (
+                <Image
+                  src={featuresImage.imageUrl}
+                  alt={featuresImage.description}
+                  fill
+                  className="rounded-lg object-cover"
+                  data-ai-hint={featuresImage.imageHint}
+                />
+              )}
             </div>
           </div>
         </div>
