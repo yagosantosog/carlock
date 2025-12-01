@@ -56,8 +56,8 @@ export function Features() {
         <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {featureData.map((feature, index) => (
             <Card key={index} className="flex flex-col items-center text-center p-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-              <CardHeader className="p-0">
-                <div className="bg-primary/10 p-3 rounded-full mb-4">
+              <CardHeader className="p-0 flex flex-col items-center">
+                <div className="flex items-center justify-center h-16 w-16 bg-primary/10 rounded-full mb-4">
                   {feature.icon}
                 </div>
                 <CardTitle>{feature.title}</CardTitle>
