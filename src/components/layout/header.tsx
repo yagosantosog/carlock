@@ -11,7 +11,6 @@ const navLinks = [
   { href: "#features", label: "Recursos" },
   { href: "#pricing", label: "Preços" },
   { href: "#testimonials", label: "Depoimentos" },
-  { href: "#contact", label: "Contato" },
 ];
 
 export function Header() {
@@ -38,9 +37,6 @@ export function Header() {
           </nav>
         </div>
         <div className="flex flex-1 items-center justify-end space-x-2">
-          <Button asChild className="hidden md:inline-flex">
-            <Link href="#contact">Solicite uma Cotação</Link>
-          </Button>
           <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
             <SheetTrigger asChild>
               <Button
@@ -74,11 +70,6 @@ export function Header() {
                     </Link>
                   ))}
                 </nav>
-                <div className="mt-auto p-4">
-                  <Button asChild className="w-full">
-                    <Link href="#contact" onClick={() => setIsMenuOpen(false)}>Solicite uma Cotação</Link>
-                  </Button>
-                </div>
               </div>
             </SheetContent>
           </Sheet>
