@@ -46,18 +46,17 @@ export function Features() {
   const featuresImage = PlaceHolderImages.find((img) => img.id === "features-app");
 
   return (
-    <section id="features" className="py-16 sm:py-24 bg-background">
+    <section id="features" className="py-16 sm:py-24 bg-white">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Image Column */}
-          <div className="flex justify-center">
+          <div className="flex justify-center relative aspect-square lg:aspect-auto lg:h-full">
             {featuresImage && (
               <Image
                 src={featuresImage.imageUrl}
                 alt={featuresImage.description}
-                width={500}
-                height={500}
-                className="rounded-lg object-contain"
+                fill
+                className="rounded-lg object-cover"
                 data-ai-hint={featuresImage.imageHint}
               />
             )}
