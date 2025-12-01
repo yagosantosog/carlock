@@ -38,7 +38,7 @@ export function Services() {
           {servicesData.map((service) => (
             <Card
               key={service.title}
-              className="group relative overflow-hidden rounded-lg border-2 border-transparent bg-background shadow-sm transition-all duration-300 hover:border-primary hover:shadow-2xl hover:-translate-y-2 flex flex-col"
+              className="group relative overflow-hidden rounded-lg border bg-card shadow-md transition-all duration-300 hover:border-primary hover:shadow-2xl hover:-translate-y-2 flex flex-col"
             >
               <CardHeader className="flex flex-col items-start p-8">
                 <div className="flex-shrink-0 bg-primary/10 p-4 rounded-full mb-5 transition-colors duration-300 group-hover:bg-primary">
