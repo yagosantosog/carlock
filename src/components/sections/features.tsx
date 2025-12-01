@@ -50,16 +50,18 @@ export function Features() {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Image Column */}
-          <div className="flex justify-center relative aspect-square lg:aspect-auto lg:h-full">
-            {featuresImage && (
-              <Image
-                src={featuresImage.imageUrl}
-                alt={featuresImage.description}
-                fill
-                className="rounded-lg object-cover"
-                data-ai-hint={featuresImage.imageHint}
-              />
-            )}
+          <div className="flex justify-center p-8">
+            <div className="relative aspect-square w-full max-w-md">
+              {featuresImage && (
+                <Image
+                  src={featuresImage.imageUrl}
+                  alt={featuresImage.description}
+                  fill
+                  className="rounded-lg object-cover"
+                  data-ai-hint={featuresImage.imageHint}
+                />
+              )}
+            </div>
           </div>
 
           {/* Content Column */}
