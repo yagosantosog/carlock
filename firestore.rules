@@ -1,0 +1,99 @@
+/**
+ * @file firestore.rules
+ * @description Firestore Security Rules for the CarLock landing page application.
+ *
+ * Core Philosophy:
+ * This ruleset is designed for a public-facing website. The primary goal is to
+ * allow anonymous users to read public-facing content (like testimonials and
+ * pricing plans) and submit data through forms (like a contact/lead form),
+ * while strictly preventing any unauthorized modification or access to sensitive data.
+ *
+ * Data Structure:
+ * The data is organized into three distinct, top-level collections:
+ * - /leads: Stores submissions from the contact form.
+ * - /testimonials: Stores public customer testimonials.
+ * - /pricingPlans: Stores public pricing plan information.
+ * There are no user-specific collections or nested data structures.
+ *
+ * Key Security Decisions:
+ * - Public Read-Only Content: The `/testimonials` and `/pricingPlans` collections
+ *   are publicly readable by anyone but cannot be modified from the client-side.
+ *   This assumes content is managed through a separate, trusted environment like
+ *   the Firebase Console or a backend service with Admin SDK access.
+ * - Write-Only Lead Submission: The `/leads` collection functions as a secure
+ *   "drop box". Anyone can create a new lead, but no one—not even the submitter—can
+ *   read, update, or delete any lead information once it's created. This prevents
+ *   the exposure of personally identifiable information (PII).
+ * - Default Deny: All operations are implicitly denied unless explicitly allowed.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // -------------------------------------------------------------------------
+    // Helper Functions
+    // -------------------------------------------------------------------------
+
+    /**
+     * Checks if a user is authenticated.
+     * While not used in this specific ruleset (due to public read/write patterns),
+     * it is a foundational helper for future development.
+     */
+    function isSignedIn() {
+      return auth != null;
+    }
+
+
+    // -------------------------------------------------------------------------
+    // Collection Rules
+    // -------------------------------------------------------------------------
+
+    /**
+     * @description Allows anyone to submit (create) a new lead but prevents anyone
+     *              from reading, updating, or deleting existing leads.
+     * @path /leads/{leadId}
+     * @allow A visitor (unauthenticated) creates a new document in `/leads`. (create)
+     * @deny Any user, authenticated or not, tries to read a lead at `/leads/some_lead_id`. (get)
+     * @principle Enforces a "write-only" data drop for public forms, protecting submitted user data from being exposed.
+     */
+    match /leads/{leadId} {
+      allow get: if false;
+      allow list: if false;
+      allow create: if true;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Allows public, read-only access to all testimonials. All write
+     *              operations are denied to secure the content.
+     * @path /testimonials/{testimonialId}
+     * @allow An unauthenticated user reads a list of all testimonials for the landing page. (list)
+     * @deny Any user attempts to create a new testimonial document from the client app. (create)
+     * @principle Secures publicly readable content by disabling all client-side writes, deferring content management to a trusted backend or admin console.
+     */
+    match /testimonials/{testimonialId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Allows public, read-only access to all pricing plans. All write
+     *              operations are denied to secure the content.
+     * @path /pricingPlans/{pricingPlanId}
+     * @allow An unauthenticated user reads the document `/pricingPlans/premium` to display its details. (get)
+     * @deny Any user attempts to update the price on an existing plan from the client app. (update)
+     * @principle Secures publicly readable content by disabling all client-side writes, deferring content management to a trusted backend or admin console.
+     */
+    match /pricingPlans/{pricingPlanId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+  }
+}
