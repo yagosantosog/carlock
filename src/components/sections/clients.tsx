@@ -38,33 +38,35 @@ export function Clients() {
             Confiança que move negócios por todo o país.
           </p>
         </div>
-        <div
-          className="relative w-full overflow-hidden cursor-grab active:cursor-grabbing"
-          style={{
-            maskImage:
-              "linear-gradient(to right, transparent, black 10%, black 90%, transparent)",
-          }}
-          ref={emblaRef}
-        >
-          <div className="animate-scroll flex gap-16">
-            {duplicatedLogos.map((logo, index) =>
-              logo ? (
-                <div
-                  key={index}
-                  className="flex-shrink-0"
-                  style={{ flex: "0 0 160px" }}
-                >
-                  <Image
-                    src={logo.imageUrl}
-                    alt={logo.description}
-                    width={160}
-                    height={80}
-                    className="object-contain aspect-[2/1]"
-                    data-ai-hint={logo.imageHint}
-                  />
-                </div>
-              ) : null
-            )}
+        <div className="max-w-6xl mx-auto">
+          <div
+            className="relative w-full overflow-hidden cursor-grab active:cursor-grabbing"
+            style={{
+              maskImage:
+                "linear-gradient(to right, transparent, black 10%, black 90%, transparent)",
+            }}
+            ref={emblaRef}
+          >
+            <div className="animate-scroll flex gap-16">
+              {duplicatedLogos.map((logo, index) =>
+                logo ? (
+                  <div
+                    key={index}
+                    className="flex-shrink-0"
+                    style={{ flex: "0 0 160px" }}
+                  >
+                    <Image
+                      src={logo.imageUrl}
+                      alt={logo.description}
+                      width={160}
+                      height={80}
+                      className="object-contain aspect-[2/1]"
+                      data-ai-hint={logo.imageHint}
+                    />
+                  </div>
+                ) : null
+              )}
+            </div>
           </div>
         </div>
       </div>
