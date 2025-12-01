@@ -1,4 +1,8 @@
+"use client";
+
+import React from "react";
 import Image from "next/image";
+import useEmblaCarousel from "embla-carousel-react";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { cn } from "@/lib/utils";
 
@@ -12,10 +16,16 @@ const clientLogoIds = [
 
 export function Clients() {
   const imageMap = new Map(PlaceHolderImages.map((i) => [i.id, i]));
-  const logos = clientLogoIds.map(id => imageMap.get(id)).filter(Boolean);
-  
+  const logos = clientLogoIds.map((id) => imageMap.get(id)).filter(Boolean);
+
   // Duplicate logos for a seamless loop
   const duplicatedLogos = [...logos, ...logos, ...logos, ...logos];
+
+  const [emblaRef] = useEmblaCarousel({
+    loop: true,
+    align: "start",
+    dragFree: true,
+  });
 
   return (
     <section id="clients" className="py-16 sm:py-24 bg-muted/40">
@@ -29,16 +39,21 @@ export function Clients() {
           </p>
         </div>
         <div
-          className="relative w-full overflow-hidden"
+          className="relative w-full overflow-hidden cursor-grab active:cursor-grabbing"
           style={{
             maskImage:
               "linear-gradient(to right, transparent, black 10%, black 90%, transparent)",
           }}
+          ref={emblaRef}
         >
           <div className="animate-scroll flex gap-16">
-            {duplicatedLogos.map((logo, index) => (
-              logo && (
-                <div key={index} className="flex-shrink-0" style={{ width: '160px' }}>
+            {duplicatedLogos.map((logo, index) =>
+              logo ? (
+                <div
+                  key={index}
+                  className="flex-shrink-0"
+                  style={{ flex: "0 0 160px" }}
+                >
                   <Image
                     src={logo.imageUrl}
                     alt={logo.description}
@@ -48,8 +63,8 @@ export function Clients() {
                     data-ai-hint={logo.imageHint}
                   />
                 </div>
-              )
-            ))}
+              ) : null
+            )}
           </div>
         </div>
       </div>
