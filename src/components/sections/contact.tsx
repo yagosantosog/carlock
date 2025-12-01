@@ -16,6 +16,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { useFirebase, addDocumentNonBlocking } from "@/firebase";
+import { collection, serverTimestamp } from "firebase/firestore";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "O nome deve ter pelo menos 2 caracteres." }),
@@ -26,19 +28,10 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
-// Mock server action
-async function submitContactForm(data: FormData) {
-  console.log("Form data submitted:", data);
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  // In a real app, you would send this data to your backend/API
-  // For this example, we'll just simulate a success response
-  return { success: true, message: "Mensagem enviada com sucesso!" };
-}
-
 export function Contact() {
   const { toast } = useToast();
+  const { firestore } = useFirebase();
+
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -50,17 +43,27 @@ export function Contact() {
   });
 
   async function onSubmit(data: FormData) {
+    if (!firestore) {
+      toast({
+        variant: "destructive",
+        title: "Erro de Configuração",
+        description: "O serviço de banco de dados não está disponível. Tente novamente mais tarde.",
+      });
+      return;
+    }
+
     try {
-      const result = await submitContactForm(data);
-      if (result.success) {
-        toast({
-          title: "Sucesso!",
-          description: "Sua mensagem foi enviada. Entraremos em contato em breve.",
-        });
-        form.reset();
-      } else {
-        throw new Error(result.message);
-      }
+      const leadsCollection = collection(firestore, "leads");
+      await addDocumentNonBlocking(leadsCollection, {
+        ...data,
+        submissionDate: serverTimestamp(),
+      });
+
+      toast({
+        title: "Sucesso!",
+        description: "Sua mensagem foi enviada. Entraremos em contato em breve.",
+      });
+      form.reset();
     } catch (error) {
       toast({
         variant: "destructive",
