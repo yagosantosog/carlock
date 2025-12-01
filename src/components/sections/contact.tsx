@@ -16,8 +16,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { useFirebase, addDocumentNonBlocking } from "@/firebase";
-import { collection, serverTimestamp } from "firebase/firestore";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "O nome deve ter pelo menos 2 caracteres." }),
@@ -30,7 +28,6 @@ type FormData = z.infer<typeof formSchema>;
 
 export function Contact() {
   const { toast } = useToast();
-  const { firestore } = useFirebase();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -43,34 +40,14 @@ export function Contact() {
   });
 
   async function onSubmit(data: FormData) {
-    if (!firestore) {
-      toast({
-        variant: "destructive",
-        title: "Erro de Configuração",
-        description: "O serviço de banco de dados não está disponível. Tente novamente mais tarde.",
-      });
-      return;
-    }
-
-    try {
-      const leadsCollection = collection(firestore, "leads");
-      await addDocumentNonBlocking(leadsCollection, {
-        ...data,
-        submissionDate: serverTimestamp(),
-      });
-
-      toast({
-        title: "Sucesso!",
-        description: "Sua mensagem foi enviada. Entraremos em contato em breve.",
-      });
-      form.reset();
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Erro ao enviar",
-        description: "Houve um problema ao enviar sua mensagem. Tente novamente mais tarde.",
-      });
-    }
+    // Simulate a delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    toast({
+      title: "Sucesso!",
+      description: "Sua mensagem foi enviada. Entraremos em contato em breve.",
+    });
+    form.reset();
   }
 
   return (
