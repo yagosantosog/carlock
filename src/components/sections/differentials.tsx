@@ -35,7 +35,7 @@ const differentialsData = [
   ];
 
 export function Differentials() {
-    const vehiclesImage = PlaceHolderImages.find((img) => img.id === "vehicles");
+    const differentialsImage = PlaceHolderImages.find((img) => img.id === "differentials-image");
 
   return (
     <section id="differentials" className="py-16 sm:py-24 bg-white">
@@ -66,14 +66,15 @@ export function Differentials() {
             </div>
 
             {/* Center Image */}
-            <div className="my-8 lg:my-0 relative min-h-[300px]">
-                {vehiclesImage && (
+            <div className="flex items-center justify-center my-8 lg:my-0">
+                {differentialsImage && (
                     <Image
-                        src={vehiclesImage.imageUrl}
-                        alt={vehiclesImage.description}
-                        fill
-                        className="rounded-lg object-contain mx-auto"
-                        data-ai-hint={vehiclesImage.imageHint}
+                        src={differentialsImage.imageUrl}
+                        alt={differentialsImage.description}
+                        width={350}
+                        height={350}
+                        className="rounded-lg object-contain"
+                        data-ai-hint={differentialsImage.imageHint}
                     />
                 )}
             </div>

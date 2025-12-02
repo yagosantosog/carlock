@@ -13,10 +13,10 @@
       "imageHint": "smartphone map app"
     },
     {
-      "id": "vehicles",
-      "description": "A collection of different vehicles including a car, a truck, and a motorcycle.",
-      "imageUrl": "https://images.unsplash.com/photo-1761927905046-2840d8d314b2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxjYXIlMjB0cnVjayUyMG1vdG9yY3ljbGV8ZW58MHx8fHwxNzY0NjE4ODQ4fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "car truck motorcycle"
+      "id": "differentials-image",
+      "description": "Imagem para a seção de diferenciais",
+      "imageUrl": "/Diferenciais.jpg",
+      "imageHint": "technology security"
     },
     {
       "id": "testimonial-1",
