@@ -30,10 +30,11 @@ export function About() {
                 <h3 className="text-sm font-bold uppercase text-primary tracking-wider mb-2">
                     Sobre nós
                 </h3>
-                <h2 className="text-3xl font-bold tracking-tight sm:text-4xl font-headline">
-                5 Anos de Experiência em Segurança e Tecnologia
+                <h2 className="text-3xl font-bold tracking-tight sm:text-4xl font-headline relative pb-4">
+                    5 Anos de Experiência em Segurança e Tecnologia
+                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-1 w-20 bg-primary"></span>
                 </h2>
-                <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">
+                <p className="mt-8 text-lg text-muted-foreground max-w-3xl mx-auto">
                 Somos uma empresa consolidada com 5 anos de experiência no mercado de rastreamento veicular. Nossa paixão é garantir sua segurança através de alta tecnologia, com agilidade e um atendimento que abrange todo o Brasil.
                 </p>
             </div>
