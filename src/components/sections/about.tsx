@@ -27,6 +27,9 @@ export function About() {
         <div className="grid grid-cols-1 gap-12 items-center">
           <div>
             <div className="text-center">
+                <h3 className="text-sm font-bold uppercase text-primary tracking-wider mb-2">
+                    Sobre nós
+                </h3>
                 <h2 className="text-3xl font-bold tracking-tight sm:text-4xl font-headline">
                 5 Anos de Experiência em Segurança e Tecnologia
                 </h2>
@@ -50,7 +53,7 @@ export function About() {
             </div>
             
             <div className="mt-12 text-center">
-                <Button asChild size="lg">
+                <Button asChild size="lg" className="transition-all duration-300 hover:brightness-90">
                     <Link href="#services">Conheça Nossas Soluções</Link>
                 </Button>
             </div>
