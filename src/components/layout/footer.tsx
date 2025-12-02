@@ -4,7 +4,7 @@ import { Facebook, Instagram, Phone } from "lucide-react";
 
 const footerSections = [
   {
-    title: "LINKS",
+    title: "Menu",
     content: (
       <ul className="space-y-2 text-sm">
         <li><Link href="#" className="text-muted-foreground hover:text-primary">Home</Link></li>
