@@ -1,9 +1,16 @@
 import Link from "next/link";
-import { CarLockLogo } from "@/components/icons/logo";
-import { Facebook, Instagram, Phone } from "lucide-react";
 import Image from "next/image";
+import { Facebook, Instagram, Phone } from "lucide-react";
 
 const footerSections = [
+  {
+    title: "SOBRE NÓS",
+    content: (
+        <p className="text-sm text-muted-foreground">
+            Somos uma Empresa de Sistema de Rastreamento de Veículos situada no município de Franca-SP, com 5 anos de experiência no mercado e que busca oferecer seviços garatindo a segurança, diante a alta tecnologia, de forma ágil e sem preceitos. Realizamos atendimentos em todo Brasil.
+        </p>
+    ),
+  },
   {
     title: "MENU",
     content: (
@@ -58,9 +65,9 @@ const footerSections = [
 
 export function Footer() {
   return (
-    <footer className="bg-foreground text-background">
+    <footer className="bg-zinc-900 text-background">
         <div className="container mx-auto px-4 py-16">
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 {footerSections.map((section) => (
                     <div key={section.title}>
                         <h3 className="text-lg font-semibold text-white mb-4 relative">
