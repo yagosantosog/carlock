@@ -62,7 +62,7 @@ export function Header() {
             </Link>
           ))}
            <Button asChild size="lg" className="transition-transform duration-300 hover:scale-105 active:scale-95 ml-4">
-            <Link href="https://api.whatsapp.com/send?phone=5516993166262" target="_blank">Solicite uma Cotação</Link>
+            <Link href="https://api.whatsapp.com/send?phone=5516993166262" target="_blank">Fale Conosco</Link>
           </Button>
         </div>
         <Sheet open={open} onOpenChange={setOpen}>
@@ -116,7 +116,7 @@ export function Header() {
             </div>
             <SheetFooter className="p-4 mt-auto border-t">
               <Button asChild size="lg" className="w-full">
-                <Link href="https://api.whatsapp.com/send?phone=5516993166262" target="_blank">Solicite uma Cotação</Link>
+                <Link href="https://api.whatsapp.com/send?phone=5516993166262" target="_blank">Fale Conosco</Link>
               </Button>
             </SheetFooter>
           </SheetContent>
