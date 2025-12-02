@@ -21,7 +21,7 @@ export function Hero() {
           Segurança e controle para seu veículo na palma da sua mão.
         </p>
         <div className="mt-8 flex justify-center">
-          <Button asChild size="lg">
+          <Button asChild size="lg" className="transition-transform duration-300 hover:scale-105 active:scale-95">
             <Link href="https://api.whatsapp.com/send?phone=5516993166262" target="_blank">Solicite uma Cotação</Link>
           </Button>
         </div>
