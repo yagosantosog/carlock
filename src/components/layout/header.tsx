@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Sheet, SheetContent, SheetFooter } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { MenuToggle } from "@/components/ui/menu-toggle";
 import { cn } from "@/lib/utils";
@@ -73,6 +73,7 @@ export function Header() {
                 "lg:hidden",
                 isScrolled ? "text-foreground bg-background" : "text-white bg-transparent border-white/50 hover:bg-white/10 hover:text-white"
               )}
+              onClick={() => setOpen(true)}
             >
               <MenuToggle
                 strokeWidth={2}
@@ -86,19 +87,21 @@ export function Header() {
             showClose={false}
             side="left"
           >
-             <div className="flex items-center justify-between p-4 border-b">
-                <Link href="/" className="flex items-center" onClick={() => setOpen(false)}>
-                  <Image src="/logo.png" alt="CarLock Logo" width={160} height={40} />
-                </Link>
-                <Button size="icon" variant="ghost" onClick={() => setOpen(false)}>
-                   <MenuToggle
-                      strokeWidth={2}
-                      open={open}
-                      onOpenChange={setOpen}
-                      className="size-6"
-                    />
-                </Button>
-             </div>
+            <SheetHeader className="p-4 flex-row items-center justify-between border-b">
+              <Link href="/" className="flex items-center" onClick={() => setOpen(false)}>
+                <Image src="/logo.png" alt="CarLock Logo" width={160} height={40} />
+              </Link>
+              <SheetTitle className="sr-only">Menu</SheetTitle>
+              <SheetDescription className="sr-only">Navegue pelas seções do site.</SheetDescription>
+              <Button size="icon" variant="ghost" onClick={() => setOpen(false)}>
+                  <MenuToggle
+                    strokeWidth={2}
+                    open={open}
+                    onOpenChange={setOpen}
+                    className="size-6"
+                  />
+              </Button>
+            </SheetHeader>
             <div className="grid gap-y-2 overflow-y-auto px-4 pt-5 pb-5">
               {navLinks.map((link) => (
                 <a
