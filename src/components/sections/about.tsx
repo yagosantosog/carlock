@@ -51,7 +51,7 @@ export function About() {
             </div>
             
             <div className="mt-12 text-center">
-                <Button asChild size="lg" className="transition-all duration-300 hover:brightness-90">
+                <Button asChild size="lg" className="transition-transform duration-300 hover:scale-105 active:scale-95">
                     <Link href="#services">Conheça Nossas Soluções</Link>
                 </Button>
             </div>
