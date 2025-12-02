@@ -61,7 +61,7 @@ export function Differentials() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             {image && (
-                <div className="flex justify-center items-center">
+                <div className="flex justify-center items-center lg:order-last">
                 <Image
                     src={image.imageUrl}
                     alt={image.description}
