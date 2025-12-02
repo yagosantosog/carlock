@@ -1,22 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, X } from "lucide-react";
-import { cn } from "@/lib/utils";
 import Image from "next/image";
-
-const navLinks = [
-  { href: "#features", label: "Serviços" },
-  { href: "#services", label: "Soluções" },
-  { href: "#about", label: "Sobre" },
-  { href: "#differentials", label: "Diferenciais" },
-];
+import { Sheet, SheetContent, SheetFooter } from "@/components/ui/sheet";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { MenuToggle } from "@/components/ui/menu-toggle";
+import { cn } from "@/lib/utils";
 
 export function Header() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -25,84 +18,110 @@ export function Header() {
     };
 
     window.addEventListener("scroll", handleScroll);
-
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
+  const navLinks = [
+    { href: "#features", label: "Serviços" },
+    { href: "#services", label: "Soluções" },
+    { href: "#about", label: "Sobre" },
+    { href: "#differentials", label: "Diferenciais" },
+  ];
+
   return (
-    <header className={cn(
+    <header
+      className={cn(
         "fixed top-0 z-50 w-full transition-all duration-300",
-        isScrolled ? "border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" : "bg-transparent"
-    )}>
-      <div className="container mx-auto px-4 flex h-20 items-center justify-between">
+        isScrolled
+          ? "border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+          : "bg-transparent"
+      )}
+    >
+      <nav className="container mx-auto flex h-24 items-center justify-between px-4">
         <Link href="/" className="flex items-center">
-            <Image
-              src={isScrolled ? "/logo.png" : "/logo_1.png"}
-              alt="CarLock Logo"
-              width={160}
-              height={40}
-            />
+          <Image
+            src={isScrolled ? "/logo.png" : "/logo_1.png"}
+            alt="CarLock Logo"
+            width={200}
+            height={50}
+          />
         </Link>
-        
-        <div className="flex items-center gap-6">
-          <nav className="hidden gap-6 md:flex">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                    "text-sm font-medium transition-colors hover:text-primary",
-                    isScrolled ? "text-foreground/60 hover:text-foreground/80" : "text-white/80 hover:text-white"
-                )}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-          
-          <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-            <SheetTrigger asChild>
-              <Button
-                variant="ghost"
-                className={cn(
-                    "px-2 text-base md:hidden",
-                    isScrolled ? "text-foreground hover:bg-accent" : "text-white hover:bg-white/10"
-                )}
-                aria-label="Toggle menu"
-              >
-                <Menu className="h-6 w-6" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="pr-0">
-              <SheetTitle className="sr-only">Menu de Navegação</SheetTitle>
-              <div className="flex flex-col h-full">
-                <div className="flex items-center justify-between p-4 border-b">
-                   <Link href="/" className="flex items-center" onClick={() => setIsMenuOpen(false)}>
-                      <Image src="/logo.png" alt="CarLock Logo" width={160} height={40} />
-                   </Link>
-                   <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(false)}>
-                      <X className="h-6 w-6" />
-                   </Button>
-                </div>
-                <nav className="flex flex-col gap-4 p-4">
-                  {navLinks.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      onClick={() => setIsMenuOpen(false)}
-                      className="text-lg font-medium text-foreground transition-colors hover:text-primary"
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
-                </nav>
-              </div>
-            </SheetContent>
-          </Sheet>
+        <div className="hidden items-center gap-2 lg:flex">
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={cn(
+                buttonVariants({ variant: "ghost" }),
+                isScrolled ? "text-foreground/60 hover:text-foreground/80" : "text-white/80 hover:text-white"
+              )}
+            >
+              {link.label}
+            </Link>
+          ))}
+           <Button asChild size="lg" className="transition-transform duration-300 hover:scale-105 active:scale-95 ml-4">
+            <Link href="https://api.whatsapp.com/send?phone=5516993166262" target="_blank">Solicite uma Cotação</Link>
+          </Button>
         </div>
-      </div>
+        <Sheet open={open} onOpenChange={setOpen}>
+            <Button
+              size="icon"
+              variant="outline"
+              className={cn(
+                "lg:hidden",
+                isScrolled ? "text-foreground bg-background" : "text-white bg-transparent border-white/50 hover:bg-white/10 hover:text-white"
+              )}
+            >
+              <MenuToggle
+                strokeWidth={2}
+                open={open}
+                onOpenChange={setOpen}
+                className="size-6"
+              />
+            </Button>
+          <SheetContent
+            className="bg-background/95 supports-[backdrop-filter]:bg-background/80 flex flex-col gap-0 backdrop-blur-lg p-0"
+            showClose={false}
+            side="left"
+          >
+             <div className="flex items-center justify-between p-4 border-b">
+                <Link href="/" className="flex items-center" onClick={() => setOpen(false)}>
+                  <Image src="/logo.png" alt="CarLock Logo" width={160} height={40} />
+                </Link>
+                <Button size="icon" variant="ghost" onClick={() => setOpen(false)}>
+                   <MenuToggle
+                      strokeWidth={2}
+                      open={open}
+                      onOpenChange={setOpen}
+                      className="size-6"
+                    />
+                </Button>
+             </div>
+            <div className="grid gap-y-2 overflow-y-auto px-4 pt-5 pb-5">
+              {navLinks.map((link) => (
+                <a
+                  key={link.href}
+                  className={buttonVariants({
+                    variant: "ghost",
+                    className: "justify-start text-lg",
+                  })}
+                  href={link.href}
+                  onClick={() => setOpen(false)}
+                >
+                  {link.label}
+                </a>
+              ))}
+            </div>
+            <SheetFooter className="p-4 mt-auto border-t">
+              <Button asChild size="lg" className="w-full">
+                <Link href="https://api.whatsapp.com/send?phone=5516993166262" target="_blank">Solicite uma Cotação</Link>
+              </Button>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
+      </nav>
     </header>
   );
 }
