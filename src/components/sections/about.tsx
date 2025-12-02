@@ -1,5 +1,3 @@
-import Image from "next/image";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Target, Rocket, ShieldCheck } from "lucide-react";
@@ -23,51 +21,39 @@ const aboutData = [
 ]
 
 export function About() {
-  const aboutImage = PlaceHolderImages.find((img) => img.id === "hero-image");
-
   return (
     <section id="about" className="py-16 sm:py-24 bg-background">
       <div className="container mx-auto px-4">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div className="order-last lg:order-first">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl font-headline">
-              5 Anos de Experiência em Segurança e Tecnologia
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Somos uma empresa consolidada com 5 anos de experiência no mercado de rastreamento veicular. Nossa paixão é garantir sua segurança através de alta tecnologia, com agilidade e um atendimento que abrange todo o Brasil.
-            </p>
+        <div className="grid grid-cols-1 gap-12 items-center">
+          <div>
+            <div className="text-center">
+                <h2 className="text-3xl font-bold tracking-tight sm:text-4xl font-headline">
+                5 Anos de Experiência em Segurança e Tecnologia
+                </h2>
+                <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">
+                Somos uma empresa consolidada com 5 anos de experiência no mercado de rastreamento veicular. Nossa paixão é garantir sua segurança através de alta tecnologia, com agilidade e um atendimento que abrange todo o Brasil.
+                </p>
+            </div>
 
-            <div className="mt-10 space-y-8">
+            <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
                 {aboutData.map((item) => (
-                    <div key={item.title} className="flex items-start gap-4">
-                        <div className="flex-shrink-0 bg-primary/10 p-3 rounded-full">
+                    <div key={item.title} className="flex flex-col items-center gap-4">
+                        <div className="flex-shrink-0 bg-primary/10 p-4 rounded-full">
                            {item.icon}
                         </div>
                         <div>
-                            <h3 className="text-lg font-semibold">{item.title}</h3>
-                            <p className="text-muted-foreground mt-1">{item.description}</p>
+                            <h3 className="text-xl font-semibold">{item.title}</h3>
+                            <p className="text-muted-foreground mt-2">{item.description}</p>
                         </div>
                     </div>
                 ))}
             </div>
             
-            <div className="mt-10">
+            <div className="mt-12 text-center">
                 <Button asChild size="lg">
                     <Link href="#services">Conheça Nossas Soluções</Link>
                 </Button>
             </div>
-          </div>
-          <div className="flex justify-center">
-            {aboutImage && (
-              <Image
-                src={aboutImage.imageUrl}
-                alt={aboutImage.description}
-                width={500}
-                height={500}
-                className="rounded-lg object-cover aspect-square"
-                data-ai-hint={aboutImage.imageHint}
-              />
-            )}
           </div>
         </div>
       </div>
