@@ -37,7 +37,7 @@ export function Header() {
         "fixed top-0 z-50 w-full transition-all duration-300",
         isScrolled
           ? "border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
-          : "bg-transparent"
+          : "bg-transparent border-b border-transparent"
       )}
     >
       <nav className="container mx-auto flex h-24 items-center justify-between px-4">
