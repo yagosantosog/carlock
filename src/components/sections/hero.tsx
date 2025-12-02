@@ -5,7 +5,7 @@ export function Hero() {
   return (
     <section className="relative w-full h-screen flex items-center justify-center overflow-hidden">
       <video
-        src="/car-location-video.mp4"
+        src="/video.mp4"
         autoPlay
         loop
         muted
