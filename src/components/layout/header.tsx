@@ -12,7 +12,6 @@ const navLinks = [
   { href: "#features", label: "Recursos" },
   { href: "#differentials", label: "Diferenciais" },
   { href: "#services", label: "Serviços" },
-  { href: "#testimonials", label: "Depoimentos" },
 ];
 
 export function Header() {

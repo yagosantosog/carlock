@@ -3,7 +3,6 @@ import { Footer } from "@/components/layout/footer";
 import { Hero } from "@/components/sections/hero";
 import { Features } from "@/components/sections/features";
 import { Services } from "@/components/sections/services";
-import { Testimonials } from "@/components/sections/testimonials";
 import { Differentials } from "@/components/sections/differentials";
 import { Clients } from "@/components/sections/clients";
 
@@ -17,7 +16,6 @@ export default function Home() {
         <Differentials />
         <Services />
         <Clients />
-        <Testimonials />
       </main>
       <Footer />
     </div>
