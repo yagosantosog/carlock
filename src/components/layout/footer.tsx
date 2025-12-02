@@ -67,9 +67,9 @@ export function Footer() {
   return (
     <footer className="bg-zinc-900 text-background">
         <div className="container mx-auto px-4 py-16">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 justify-items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 {footerSections.map((section) => (
-                    <div key={section.title} className="w-full max-w-xs">
+                    <div key={section.title} className="w-full">
                         <h3 className="text-lg font-semibold text-white mb-4 relative">
                             {section.title}
                             <span className="absolute bottom-[-8px] left-0 h-0.5 w-10 bg-primary"></span>
