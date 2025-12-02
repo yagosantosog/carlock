@@ -1,11 +1,12 @@
+
 "use client";
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function Header() {
@@ -53,7 +54,7 @@ export function Header() {
           <Link href="#about" className={cn( buttonVariants({ variant: "ghost" }), isScrolled ? "text-foreground/60 hover:text-foreground/80" : "text-white/80 hover:text-white" )}>Sobre</Link>
           <Link href="#differentials" className={cn( buttonVariants({ variant: "ghost" }), isScrolled ? "text-foreground/60 hover:text-foreground/80" : "text-white/80 hover:text-white" )}>Diferenciais</Link>
           <Link href="#services" className={cn( buttonVariants({ variant: "ghost" }), isScrolled ? "text-foreground/60 hover:text-foreground/80" : "text-white/80 hover:text-white" )}>Soluções</Link>
-           <Button asChild size="lg" className="transition-transform duration-300 hover:scale-105 active:scale-95 ml-4">
+          <Button asChild size="lg" className="transition-transform duration-300 hover:scale-105 active:scale-95 ml-4">
             <Link href="https://api.whatsapp.com/send?phone=5516993166262" target="_blank">Fale Conosco</Link>
           </Button>
         </div>
@@ -67,7 +68,11 @@ export function Header() {
                 isScrolled ? "text-foreground bg-background" : "text-white bg-transparent border-white/50 hover:bg-white/10 hover:text-white"
               )}
             >
-              <Menu className="h-6 w-6" />
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-6 w-6">
+                <path d="M4 6H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M4 12H16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M4 18H12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
               <span className="sr-only">Abrir menu</span>
             </Button>
           </SheetTrigger>
@@ -76,12 +81,11 @@ export function Header() {
             showClose={false}
             side="left"
           >
-             <SheetHeader className="p-4 flex-row items-center justify-between border-b">
+            <SheetHeader className="p-4 flex-row items-center justify-between border-b">
+                <SheetTitle className="sr-only">Menu</SheetTitle>
                 <Link href="/" onClick={() => setOpen(false)}>
                   <Image src="/logo.png" alt="CarLock Logo" width={160} height={40} />
                 </Link>
-                <SheetTitle className="sr-only">Menu</SheetTitle>
-                <SheetDescription className="sr-only">Navegação principal do site</SheetDescription>
               <SheetClose asChild>
                 <Button size="icon" variant="ghost">
                     <X className="h-6 w-6" />
