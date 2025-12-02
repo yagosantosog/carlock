@@ -8,6 +8,7 @@ interface MenuItem {
     text: string;
     url: string;
     isExternal?: boolean;
+    icon?: React.ComponentType<{ className?: string }>;
   }[];
 }
 
@@ -33,14 +34,14 @@ const menuItems: MenuItem[] = [
     {
       title: "INFORMAÇÕES",
       links: [
-        { text: "(16) 99316-6262", url: "https://api.whatsapp.com/send?phone=5516993166262", isExternal: true },
+        { text: "(16) 99316-6262", url: "https://api.whatsapp.com/send?phone=5516993166262", isExternal: true, icon: Phone },
       ],
     },
     {
       title: "SOCIAL",
       links: [
-        { text: "Facebook", url: "#", isExternal: true },
-        { text: "Instagram", url: "#", isExternal: true },
+        { text: "Facebook", url: "#", isExternal: true, icon: Facebook },
+        { text: "Instagram", url: "#", isExternal: true, icon: Instagram },
       ],
     },
   ];
@@ -50,7 +51,7 @@ const copyright = `© ${new Date().getFullYear()} CarLock. Todos os direitos res
 export function Footer() {
   return (
     <footer className="bg-zinc-900 text-background">
-      <div className="container py-16 sm:py-24">
+      <div className="container mx-auto px-4 py-16 sm:py-24">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
             <div className="col-span-1 md:col-span-2 lg:col-span-2 mb-8 lg:mb-0">
                <Link href="/" className="flex items-center gap-2">
@@ -67,17 +68,9 @@ export function Footer() {
                 <ul className="space-y-3">
                   {section.links.map((link) => (
                     <li key={link.text} className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
-                      <Link href={link.url} target={link.isExternal ? "_blank" : undefined}>
-                        {link.title === 'INFORMAÇÕES' || link.title === 'SOCIAL' ? (
-                            <div className="flex items-center gap-2">
-                                {link.text === "Facebook" && <Facebook className="h-5 w-5" />}
-                                {link.text === "Instagram" && <Instagram className="h-5 w-5" />}
-                                {link.title === 'INFORMAÇÕES' && <Phone className="w-4 h-4"/>}
-                                <span>{link.text}</span>
-                            </div>
-                        ) : (
-                           link.text
-                        )}
+                      <Link href={link.url} target={link.isExternal ? "_blank" : undefined} className="flex items-center gap-2">
+                        {link.icon && <link.icon className="h-4 w-4" />}
+                        <span>{link.text}</span>
                       </Link>
                     </li>
                   ))}
