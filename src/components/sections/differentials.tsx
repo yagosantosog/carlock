@@ -55,7 +55,7 @@ export function Differentials() {
             <div className="space-y-10 flex flex-col justify-center">
                 {differentialsData.slice(0, 2).map((item) => (
                     <div key={item.title} className="group flex items-start gap-4">
-                        <div className="flex-shrink-0 bg-primary/10 p-3 rounded-full transition-colors duration-300 group-hover:bg-primary">
+                        <div className="flex-shrink-0 bg-primary/10 p-3 rounded-full transition-all duration-300 group-hover:bg-primary group-hover:scale-110">
                             {item.icon}
                         </div>
                         <div>
@@ -84,7 +84,7 @@ export function Differentials() {
             <div className="space-y-10 flex flex-col justify-center">
                 {differentialsData.slice(2, 4).map((item) => (
                      <div key={item.title} className="group flex items-start gap-4">
-                        <div className="flex-shrink-0 bg-primary/10 p-3 rounded-full transition-colors duration-300 group-hover:bg-primary">
+                        <div className="flex-shrink-0 bg-primary/10 p-3 rounded-full transition-all duration-300 group-hover:bg-primary group-hover:scale-110">
                             {item.icon}
                         </div>
                         <div>

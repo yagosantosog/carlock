@@ -42,7 +42,7 @@ export function Services() {
               className="group relative overflow-hidden rounded-lg border bg-card shadow-md transition-all duration-300 hover:border-primary hover:shadow-2xl hover:-translate-y-2 flex flex-col"
             >
               <CardHeader className="flex flex-col items-start p-8">
-                <div className="flex-shrink-0 bg-primary/10 p-4 rounded-full mb-5 transition-colors duration-300 group-hover:bg-primary">
+                <div className="flex-shrink-0 bg-primary/10 p-4 rounded-full mb-5 transition-all duration-300 group-hover:bg-primary group-hover:scale-110">
                   {service.icon}
                 </div>
                 <CardTitle className="text-2xl font-bold">{service.title}</CardTitle>

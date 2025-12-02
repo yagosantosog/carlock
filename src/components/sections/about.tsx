@@ -39,7 +39,7 @@ export function About() {
             <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
                 {aboutData.map((item) => (
                     <div key={item.title} className="group flex flex-col items-center gap-4">
-                        <div className="flex-shrink-0 bg-primary/10 p-4 rounded-full transition-colors duration-300 group-hover:bg-primary">
+                        <div className="flex-shrink-0 bg-primary/10 p-4 rounded-full transition-all duration-300 group-hover:bg-primary group-hover:scale-110">
                            {item.icon}
                         </div>
                         <div>

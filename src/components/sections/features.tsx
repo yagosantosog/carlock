@@ -61,7 +61,7 @@ export function Features() {
             <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-10">
               {featureData.map((feature) => (
                 <div key={feature.title} className="group flex items-start gap-4">
-                  <div className="flex-shrink-0 flex items-center justify-center h-12 w-12 bg-primary/10 rounded-lg transition-colors duration-300 group-hover:bg-primary">
+                  <div className="flex-shrink-0 flex items-center justify-center h-12 w-12 bg-primary/10 rounded-lg transition-all duration-300 group-hover:bg-primary group-hover:scale-110">
                     {feature.icon}
                   </div>
                   <div>
