@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -49,18 +49,10 @@ export function Header() {
           />
         </Link>
         <div className="hidden items-center gap-2 lg:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={cn(
-                buttonVariants({ variant: "ghost" }),
-                isScrolled ? "text-foreground/60 hover:text-foreground/80" : "text-white/80 hover:text-white"
-              )}
-            >
-              {link.label}
-            </Link>
-          ))}
+          <Link href="#features" className={cn( buttonVariants({ variant: "ghost" }), isScrolled ? "text-foreground/60 hover:text-foreground/80" : "text-white/80 hover:text-white" )}>Serviços</Link>
+          <Link href="#about" className={cn( buttonVariants({ variant: "ghost" }), isScrolled ? "text-foreground/60 hover:text-foreground/80" : "text-white/80 hover:text-white" )}>Sobre</Link>
+          <Link href="#differentials" className={cn( buttonVariants({ variant: "ghost" }), isScrolled ? "text-foreground/60 hover:text-foreground/80" : "text-white/80 hover:text-white" )}>Diferenciais</Link>
+          <Link href="#services" className={cn( buttonVariants({ variant: "ghost" }), isScrolled ? "text-foreground/60 hover:text-foreground/80" : "text-white/80 hover:text-white" )}>Soluções</Link>
            <Button asChild size="lg" className="transition-transform duration-300 hover:scale-105 active:scale-95 ml-4">
             <Link href="https://api.whatsapp.com/send?phone=5516993166262" target="_blank">Fale Conosco</Link>
           </Button>
@@ -84,17 +76,19 @@ export function Header() {
             showClose={false}
             side="left"
           >
-            <div className="p-4 flex-row items-center justify-between border-b flex">
-              <Link href="/" className="flex items-center" onClick={() => setOpen(false)}>
-                <Image src="/logo.png" alt="CarLock Logo" width={160} height={40} />
-              </Link>
+             <SheetHeader className="p-4 flex-row items-center justify-between border-b">
+                <Link href="/" onClick={() => setOpen(false)}>
+                  <Image src="/logo.png" alt="CarLock Logo" width={160} height={40} />
+                </Link>
+                <SheetTitle className="sr-only">Menu</SheetTitle>
+                <SheetDescription className="sr-only">Navegação principal do site</SheetDescription>
               <SheetClose asChild>
                 <Button size="icon" variant="ghost">
                     <X className="h-6 w-6" />
                     <span className="sr-only">Fechar menu</span>
                 </Button>
               </SheetClose>
-            </div>
+            </SheetHeader>
             <div className="grid gap-y-2 overflow-y-auto px-4 pt-5 pb-5">
               {navLinks.map((link) => (
                 <a
