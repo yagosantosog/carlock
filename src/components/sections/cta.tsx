@@ -37,7 +37,7 @@ export function Cta() {
             </div>
             <div className="flex-shrink-0">
                 <Button asChild size="lg" variant="outline" className="bg-transparent border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300">
-                    <Link href="#">FALE CONOSCO</Link>
+                    <Link href="https://api.whatsapp.com/send?phone=5516993166262" target="_blank">FALE CONOSCO</Link>
                 </Button>
             </div>
         </div>

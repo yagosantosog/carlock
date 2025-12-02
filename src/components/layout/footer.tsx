@@ -30,10 +30,10 @@ const footerSections = [
     content: (
       <div className="space-y-2 text-sm">
         <p className="text-muted-foreground">Entre em contato conosco.</p>
-        <div className="flex items-center gap-2 text-muted-foreground">
+        <Link href="https://api.whatsapp.com/send?phone=5516993166262" target="_blank" className="flex items-center gap-2 text-muted-foreground hover:text-primary">
             <Phone className="w-4 h-4"/>
             <span>(16) 99316-6262</span>
-        </div>
+        </Link>
         <div className="flex items-center space-x-4 pt-2">
           <Link
             href="#"

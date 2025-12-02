@@ -32,7 +32,7 @@ export function Hero() {
         </p>
         <div className="mt-8 flex justify-center">
           <Button asChild size="lg">
-            <Link href="#pricing">Solicite uma Cotação</Link>
+            <Link href="https://api.whatsapp.com/send?phone=5516993166262" target="_blank">Solicite uma Cotação</Link>
           </Button>
         </div>
       </div>
