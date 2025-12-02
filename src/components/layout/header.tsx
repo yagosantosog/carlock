@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { CarLockLogo } from "@/components/icons/logo";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -38,15 +37,13 @@ export function Header() {
         isScrolled ? "border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" : "bg-transparent"
     )}>
       <div className="container mx-auto px-4 flex h-14 items-center justify-between">
-        <Link href="/" className="flex items-center space-x-2">
+        <Link href="/" className="flex items-center">
             <Image
               src={isScrolled ? "/logo.png" : "/logo_1.png"}
               alt="CarLock Logo"
-              width={24}
-              height={24}
-              className="h-6 w-6"
+              width={120}
+              height={30}
             />
-            <span className={cn("font-bold", isScrolled ? "text-foreground" : "text-white")}>CarLock</span>
         </Link>
         
         <div className="flex items-center gap-6">
@@ -82,9 +79,8 @@ export function Header() {
               <SheetTitle className="sr-only">Menu de Navegação</SheetTitle>
               <div className="flex flex-col h-full">
                 <div className="flex items-center justify-between p-4 border-b">
-                   <Link href="/" className="flex items-center space-x-2" onClick={() => setIsMenuOpen(false)}>
-                      <Image src="/logo.png" alt="CarLock Logo" width={24} height={24} className="h-6 w-6" />
-                      <span className="font-bold">CarLock</span>
+                   <Link href="/" className="flex items-center" onClick={() => setIsMenuOpen(false)}>
+                      <Image src="/logo.png" alt="CarLock Logo" width={120} height={30} />
                    </Link>
                    <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(false)}>
                       <X className="h-6 w-6" />

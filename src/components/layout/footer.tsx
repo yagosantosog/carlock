@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CarLockLogo } from "@/components/icons/logo";
 import { Facebook, Instagram, Phone } from "lucide-react";
+import Image from "next/image";
 
 const footerSections = [
   {
@@ -73,9 +74,8 @@ export function Footer() {
         </div>
         <div className="border-t border-gray-700">
             <div className="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center">
-                <div className="flex items-center space-x-2 mb-4 md:mb-0">
-                  <CarLockLogo className="h-6 w-6 text-primary" />
-                  <span className="font-bold text-white">CarLock</span>
+                <div className="flex items-center mb-4 md:mb-0">
+                  <Image src="/logo_1.png" alt="CarLock Logo" width={120} height={30} />
                 </div>
                 <p className="text-center text-sm text-muted-foreground">
                     © {new Date().getFullYear()} CarLock. Todos os direitos reservados.
