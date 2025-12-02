@@ -36,13 +36,13 @@ export function Header() {
         "fixed top-0 z-50 w-full transition-all duration-300",
         isScrolled ? "border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" : "bg-transparent"
     )}>
-      <div className="container mx-auto px-4 flex h-14 items-center justify-between">
+      <div className="container mx-auto px-4 flex h-20 items-center justify-between">
         <Link href="/" className="flex items-center">
             <Image
               src={isScrolled ? "/logo.png" : "/logo_1.png"}
               alt="CarLock Logo"
-              width={120}
-              height={30}
+              width={160}
+              height={40}
             />
         </Link>
         
@@ -80,7 +80,7 @@ export function Header() {
               <div className="flex flex-col h-full">
                 <div className="flex items-center justify-between p-4 border-b">
                    <Link href="/" className="flex items-center" onClick={() => setIsMenuOpen(false)}>
-                      <Image src="/logo.png" alt="CarLock Logo" width={120} height={30} />
+                      <Image src="/logo.png" alt="CarLock Logo" width={160} height={40} />
                    </Link>
                    <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(false)}>
                       <X className="h-6 w-6" />
