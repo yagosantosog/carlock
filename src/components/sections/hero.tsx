@@ -4,7 +4,11 @@ import { Button } from "@/components/ui/button";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 export function Hero() {
-  const heroImage = PlaceHolderImages.find((img) => img.id === "hero-image");
+  const heroImage = {
+    imageUrl: "/car-location.jpg",
+    description: "Car Location",
+    imageHint: "Car Location",
+  } ;
 
   return (
     <section className="relative w-full h-screen flex items-center justify-center">

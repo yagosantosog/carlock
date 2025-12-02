@@ -52,7 +52,7 @@ export function Clients() {
                 logo ? (
                   <div
                     key={index}
-                    className="flex-shrink-0"
+                    className="flex-shrink-0 pointer-events-none"
                     style={{ flex: "0 0 160px" }}
                   >
                     <Image
