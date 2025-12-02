@@ -24,7 +24,7 @@ const footerSections = [
     ),
   },
   {
-    title: "NOSSOS SERVIÇOS",
+    title: "SERVIÇOS",
     content: (
         <ul className="space-y-2 text-sm">
             <li><span className="text-muted-foreground">Rastreador para carros</span></li>
