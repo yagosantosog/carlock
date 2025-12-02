@@ -4,7 +4,11 @@ import { Button } from "@/components/ui/button";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 export function Cta() {
-  const ctaImage = {}
+  const ctaImage = {
+    imageUrl: "/moto-riding.jpg",
+    description: "Moto Riding",
+    imageHint: "Moto Riding",
+  }
   return (
     <section
       id="cta"
@@ -28,7 +32,7 @@ export function Cta() {
                 SOLICITE UM <span className="text-primary">ORÇAMENTO</span> AGORA MESMO
                 </h2>
                 <p className="mt-4 text-lg text-neutral-200 max-w-2xl">
-                Conheça nossos planos e tenha seu veículo protegido com nossa logística eficaz e de alta tecnologia.
+                Conheça nossos planos e tenha seu veículo rastreado com nossa logística eficaz e de alta tecnologia.
                 </p>
             </div>
             <div className="flex-shrink-0">
