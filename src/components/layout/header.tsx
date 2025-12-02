@@ -46,8 +46,7 @@ export function Header() {
             src={isScrolled ? "/logo.png" : "/logo_1.png"}
             alt="CarLock Logo"
             width={200}
-            height={0}
-            style={{ height: 'auto' }}
+            height={50}
             priority
           />
         </Link>
@@ -87,7 +86,7 @@ export function Header() {
                 <SheetTitle className="sr-only">Menu</SheetTitle>
                  <SheetDescription className="sr-only">Navegação principal do site</SheetDescription>
                 <Link href="/" onClick={() => setOpen(false)}>
-                  <Image src="/logo.png" alt="CarLock Logo" width={160} height={0} style={{ height: 'auto' }} />
+                  <Image src="/logo.png" alt="CarLock Logo" width={160} height={40} />
                 </Link>
               <SheetClose asChild>
                 <Button size="icon" variant="ghost">

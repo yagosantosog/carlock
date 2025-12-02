@@ -55,7 +55,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
             <div className="col-span-1 md:col-span-2 lg:col-span-2 mb-8 lg:mb-0">
                <Link href="/" className="flex items-center gap-2">
-                  <Image src="/logo_1.png" alt="CarLock Logo" width={160} height={0} style={{ height: 'auto' }} />
+                  <Image src="/logo_1.png" alt="CarLock Logo" width={160} height={40} />
                </Link>
               <p className="mt-4 text-sm text-muted-foreground text-justify">
                   Somos uma Empresa de Sistema de Rastreamento de Veículos situada no município de Franca-SP, com 5 anos de experiência no mercado e que busca oferecer seviços garatindo a segurança, diante a alta tecnologia, de forma ágil e sem preceitos. Realizamos atendimentos em todo Brasil.
