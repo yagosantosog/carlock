@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { CarLockLogo } from "@/components/icons/logo";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -73,6 +73,7 @@ export function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="pr-0">
+              <SheetTitle className="sr-only">Menu de Navegação</SheetTitle>
               <div className="flex flex-col h-full">
                 <div className="flex items-center justify-between p-4 border-b">
                    <Link href="/" className="flex items-center space-x-2" onClick={() => setIsMenuOpen(false)}>
