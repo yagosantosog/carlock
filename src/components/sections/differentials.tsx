@@ -41,10 +41,11 @@ export function Differentials() {
     <section id="differentials" className="py-16 sm:py-24 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl font-headline">
-            Nossos Diferenciais
-          </h2>
-          <p className="mt-4 text-lg text-muted-foreground">
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl font-headline relative pb-4">
+                Nossos Diferenciais
+                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-1 w-20 bg-primary"></span>
+            </h2>
+          <p className="mt-8 text-lg text-muted-foreground">
             Veja por que a CarLock é a escolha certa para você.
           </p>
         </div>

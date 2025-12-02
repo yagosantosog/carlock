@@ -26,10 +26,11 @@ export function Services() {
     <section id="services" className="py-16 sm:py-24 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl font-headline">
-            Soluções Completas em Rastreamento
-          </h2>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl font-headline relative pb-4">
+                Soluções Completas em Rastreamento
+                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-1 w-20 bg-primary"></span>
+            </h2>
+          <p className="mt-8 max-w-2xl mx-auto text-lg text-muted-foreground">
             Oferecemos a tecnologia ideal para proteger cada tipo de veículo com
             precisão e confiabilidade.
           </p>
@@ -48,7 +49,7 @@ export function Services() {
               </CardHeader>
               <CardContent className="p-8 pt-0 flex flex-col flex-grow">
                 <p className="text-muted-foreground mb-6 flex-grow">{service.description}</p>
-                <Button asChild variant="link" className="p-0 h-auto self-start font-semibold text-lg text-primary">
+                <Button asChild variant="link" className="p-0 h-auto self-start font-semibold text-lg text-primary transition-all duration-300 hover:brightness-90">
                    <Link href="#">Saiba Mais</Link>
                 </Button>
               </CardContent>

@@ -4,8 +4,7 @@ import { Button } from "@/components/ui/button";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 export function Cta() {
-  const ctaImage = PlaceHolderImages.find((img) => img.id === "cta-background");
-
+  const ctaImage = {}
   return (
     <section
       id="cta"

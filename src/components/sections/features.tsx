@@ -51,10 +51,11 @@ export function Features() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Content Column */}
           <div className="lg:order-last">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl font-headline">
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl font-headline relative pb-4 text-center lg:text-left">
               Tudo que você precisa para sua segurança
+              <span className="absolute bottom-0 left-1/2 lg:left-0 -translate-x-1/2 lg:translate-x-0 h-1 w-20 bg-primary"></span>
             </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
+            <p className="mt-8 text-lg text-muted-foreground text-center lg:text-left">
               Explore os recursos que fazem do CarLock a melhor solução de rastreamento veicular.
             </p>
             <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-10">
