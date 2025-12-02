@@ -6,7 +6,7 @@ const footerSections = [
   {
     title: "SOBRE",
     content: (
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground text-justify">
             Somos uma Empresa de Sistema de Rastreamento de Veículos situada no município de Franca-SP, com 5 anos de experiência no mercado e que busca oferecer seviços garatindo a segurança, diante a alta tecnologia, de forma ágil e sem preceitos. Realizamos atendimentos em todo Brasil.
         </p>
     ),
