@@ -1,29 +1,19 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 export function Hero() {
-  const heroImage = {
-    imageUrl: "/car-location.jpg",
-    description: "Car Location",
-    imageHint: "Car Location",
-  } ;
-
   return (
-    <section className="relative w-full h-screen flex items-center justify-center">
-      {heroImage && (
-        <Image
-          src={heroImage.imageUrl}
-          alt={heroImage.description}
-          fill
-          className="object-cover"
-          priority
-          data-ai-hint={heroImage.imageHint}
-        />
-      )}
-      <div className="absolute inset-0 bg-black/50" />
-      <div className="relative z-10 container mx-auto px-4 text-center text-white">
+    <section className="relative w-full h-screen flex items-center justify-center overflow-hidden">
+      <video
+        src="/car-location-video.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute top-0 left-0 w-full h-full object-cover z-0"
+      />
+      <div className="absolute inset-0 bg-black/50 z-10" />
+      <div className="relative z-20 container mx-auto px-4 text-center text-white">
         <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl font-headline">
           Rastreamento Veicular Inteligente
         </h1>
