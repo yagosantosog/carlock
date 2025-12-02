@@ -8,10 +8,10 @@ const footerSections = [
     content: (
       <ul className="space-y-2 text-sm">
         <li><Link href="#" className="text-muted-foreground hover:text-primary">Home</Link></li>
-        <li><Link href="#services" className="text-muted-foreground hover:text-primary">Serviços</Link></li>
+        <li><Link href="#services" className="text-muted-foreground hover:text-primary">Soluções</Link></li>
         <li><Link href="#about" className="text-muted-foreground hover:text-primary">Sobre Nós</Link></li>
         <li><Link href="#differentials" className="text-muted-foreground hover:text-primary">Diferenciais</Link></li>
-        <li><Link href="#features" className="text-muted-foreground hover:text-primary">Recursos</Link></li>
+        <li><Link href="#features" className="text-muted-foreground hover:text-primary">Serviços</Link></li>
       </ul>
     ),
   },
