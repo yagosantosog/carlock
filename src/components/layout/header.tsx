@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { MenuToggle } from "@/components/ui/menu-toggle";
+import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function Header() {
@@ -75,12 +75,8 @@ export function Header() {
                 isScrolled ? "text-foreground bg-background" : "text-white bg-transparent border-white/50 hover:bg-white/10 hover:text-white"
               )}
             >
-              <MenuToggle
-                strokeWidth={2}
-                open={open}
-                onOpenChange={setOpen}
-                className="size-6"
-              />
+              <Menu className="h-6 w-6" />
+              <span className="sr-only">Abrir menu</span>
             </Button>
           </SheetTrigger>
           <SheetContent
@@ -94,12 +90,8 @@ export function Header() {
               </Link>
               <SheetClose asChild>
                 <Button size="icon" variant="ghost">
-                    <MenuToggle
-                      strokeWidth={2}
-                      open={open}
-                      onOpenChange={setOpen}
-                      className="size-6"
-                    />
+                    <X className="h-6 w-6" />
+                    <span className="sr-only">Fechar menu</span>
                 </Button>
               </SheetClose>
             </div>
