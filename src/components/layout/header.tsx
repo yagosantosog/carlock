@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -46,7 +46,9 @@ export function Header() {
             src={isScrolled ? "/logo.png" : "/logo_1.png"}
             alt="CarLock Logo"
             width={200}
-            height={50}
+            height={0}
+            style={{ height: 'auto' }}
+            priority
           />
         </Link>
         <div className="hidden items-center gap-2 lg:flex">
@@ -81,10 +83,11 @@ export function Header() {
             showClose={false}
             side="left"
           >
-            <SheetHeader className="p-4 flex-row items-center justify-between border-b">
+             <SheetHeader className="p-4 flex-row items-center justify-between border-b">
                 <SheetTitle className="sr-only">Menu</SheetTitle>
+                 <SheetDescription className="sr-only">Navegação principal do site</SheetDescription>
                 <Link href="/" onClick={() => setOpen(false)}>
-                  <Image src="/logo.png" alt="CarLock Logo" width={160} height={40} />
+                  <Image src="/logo.png" alt="CarLock Logo" width={160} height={0} style={{ height: 'auto' }} />
                 </Link>
               <SheetClose asChild>
                 <Button size="icon" variant="ghost">
