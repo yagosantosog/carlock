@@ -50,7 +50,7 @@ export function Services() {
               <CardContent className="p-8 pt-0 flex flex-col flex-grow">
                 <p className="text-muted-foreground mb-6 flex-grow">{service.description}</p>
                 <Button asChild variant="link" className="p-0 h-auto self-start font-semibold text-lg text-primary transition-all duration-300 hover:brightness-90">
-                   <Link href="#">Saiba Mais</Link>
+                   <Link href="https://api.whatsapp.com/send?phone=5516993166262" target="_blank">Saiba Mais</Link>
                 </Button>
               </CardContent>
             </Card>
