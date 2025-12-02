@@ -6,6 +6,7 @@ import { About } from "@/components/sections/about";
 import { Services } from "@/components/sections/services";
 import { Differentials } from "@/components/sections/differentials";
 import { Clients } from "@/components/sections/clients";
+import { Cta } from "@/components/sections/cta";
 
 export default function Home() {
   return (
@@ -18,6 +19,7 @@ export default function Home() {
         <Differentials />
         <Services />
         <Clients />
+        <Cta />
       </main>
       <Footer />
     </div>
