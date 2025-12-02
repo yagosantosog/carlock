@@ -4,17 +4,17 @@ import { Target, Rocket, ShieldCheck } from "lucide-react";
 
 const aboutData = [
     {
-        icon: <Target className="w-8 h-8 text-primary" />,
+        icon: <Target className="w-8 h-8 text-primary group-hover:text-white transition-colors duration-300" />,
         title: "Nossa Missão",
         description: "Oferecer segurança e tranquilidade através de tecnologia de rastreamento de ponta, acessível a todos.",
     },
     {
-        icon: <Rocket className="w-8 h-8 text-primary" />,
+        icon: <Rocket className="w-8 h-8 text-primary group-hover:text-white transition-colors duration-300" />,
         title: "Nossa Visão",
         description: "Ser a empresa líder e referência em inovação no mercado de rastreamento veicular em todo o Brasil.",
     },
     {
-        icon: <ShieldCheck className="w-8 h-8 text-primary" />,
+        icon: <ShieldCheck className="w-8 h-8 text-primary group-hover:text-white transition-colors duration-300" />,
         title: "Nossos Valores",
         description: "Compromisso com a qualidade, excelência no atendimento, inovação constante e total dedicação ao cliente.",
     }
@@ -37,8 +37,8 @@ export function About() {
 
             <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
                 {aboutData.map((item) => (
-                    <div key={item.title} className="flex flex-col items-center gap-4">
-                        <div className="flex-shrink-0 bg-primary/10 p-4 rounded-full">
+                    <div key={item.title} className="group flex flex-col items-center gap-4">
+                        <div className="flex-shrink-0 bg-primary/10 p-4 rounded-full transition-colors duration-300 group-hover:bg-primary">
                            {item.icon}
                         </div>
                         <div>

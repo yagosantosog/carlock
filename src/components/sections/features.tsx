@@ -11,32 +11,32 @@ import {
 
 const featureData = [
   {
-    icon: <MapPin className="w-6 h-6 text-primary" />,
+    icon: <MapPin className="w-6 h-6 text-primary group-hover:text-white transition-colors duration-300" />,
     title: "Rastreamento em Tempo Real",
     description: "Acompanhe a localização do seu veículo 24/7 com precisão e em tempo real.",
   },
   {
-    icon: <ShieldAlert className="w-6 h-6 text-primary" />,
+    icon: <ShieldAlert className="w-6 h-6 text-primary group-hover:text-white transition-colors duration-300" />,
     title: "Alertas de Segurança",
     description: "Receba notificações instantâneas sobre ignição, movimento e excesso de velocidade.",
   },
   {
-    icon: <History className="w-6 h-6 text-primary" />,
+    icon: <History className="w-6 h-6 text-primary group-hover:text-white transition-colors duration-300" />,
     title: "Histórico de Rotas",
     description: "Acesse o histórico detalhado de todas as rotas percorridas pelo seu veículo.",
   },
   {
-    icon: <Lock className="w-6 h-6 text-primary" />,
+    icon: <Lock className="w-6 h-6 text-primary group-hover:text-white transition-colors duration-300" />,
     title: "Bloqueio Remoto",
     description: "Em caso de roubo, bloqueie seu veículo remotamente com apenas um clique.",
   },
   {
-    icon: <Gauge className="w-6 h-6 text-primary" />,
+    icon: <Gauge className="w-6 h-6 text-primary group-hover:text-white transition-colors duration-300" />,
     title: "Controle de Velocidade",
     description: "Monitore e seja alertado sempre que o limite de velocidade for ultrapassado.",
   },
   {
-    icon: <SquareDashed className="w-6 h-6 text-primary" />,
+    icon: <SquareDashed className="w-6 h-6 text-primary group-hover:text-white transition-colors duration-300" />,
     title: "Cerca Virtual",
     description: "Defina áreas seguras e receba alertas quando o veículo entrar ou sair delas.",
   },
@@ -59,8 +59,8 @@ export function Features() {
             </p>
             <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-10">
               {featureData.map((feature) => (
-                <div key={feature.title} className="flex items-start gap-4">
-                  <div className="flex-shrink-0 flex items-center justify-center h-12 w-12 bg-primary/10 rounded-lg">
+                <div key={feature.title} className="group flex items-start gap-4">
+                  <div className="flex-shrink-0 flex items-center justify-center h-12 w-12 bg-primary/10 rounded-lg transition-colors duration-300 group-hover:bg-primary">
                     {feature.icon}
                   </div>
                   <div>
