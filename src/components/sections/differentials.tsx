@@ -1,11 +1,13 @@
 "use client";
 
+import Image from "next/image";
 import { Award, Wrench, Users, Clock } from "lucide-react";
 import {
   HighlightGroup,
   HighlighterItem,
   Particles,
 } from "@/components/ui/highlighter";
+import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 const differentialsData = [
   {
@@ -43,6 +45,7 @@ const differentialsData = [
 ];
 
 export function Differentials() {
+  const image = PlaceHolderImages.find((img) => img.id === "differentials-image");
   return (
     <section id="differentials" className="py-16 sm:py-24 bg-white">
       <div className="container mx-auto px-4">
@@ -56,34 +59,48 @@ export function Differentials() {
           </p>
         </div>
 
-        <HighlightGroup className="group grid grid-cols-1 md:grid-cols-2 gap-8">
-          {differentialsData.map((item) => (
-            <div key={item.title} className="h-full">
-              <HighlighterItem className="h-full rounded-3xl">
-                <div className="relative z-20 h-full overflow-hidden rounded-3xl border border-border/20 bg-card p-6">
-                   <Particles
-                    className="absolute inset-0 -z-10 opacity-0 transition-opacity duration-1000 ease-in-out group-hover:opacity-100"
-                    quantity={50}
-                    color={"hsl(var(--primary))"}
-                    vy={-0.1}
-                    vx={0.1}
-                  />
-                  <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0 bg-primary/10 p-3 rounded-full transition-all duration-300 group-hover:bg-primary group-hover:scale-110">
-                      {item.icon}
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold">{item.title}</h3>
-                      <p className="text-muted-foreground mt-1">
-                        {item.description}
-                      </p>
-                    </div>
-                  </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+            {image && (
+                <div className="flex justify-center items-center">
+                <Image
+                    src={image.imageUrl}
+                    alt={image.description}
+                    width={500}
+                    height={500}
+                    className="rounded-lg object-contain"
+                    data-ai-hint={image.imageHint}
+                />
                 </div>
-              </HighlighterItem>
-            </div>
-          ))}
-        </HighlightGroup>
+            )}
+            <HighlightGroup className="group grid grid-cols-1 md:grid-cols-2 gap-8">
+            {differentialsData.map((item) => (
+                <div key={item.title} className="h-full">
+                <HighlighterItem className="h-full rounded-3xl">
+                    <div className="relative z-20 h-full overflow-hidden rounded-3xl border border-border/20 bg-card p-6">
+                    <Particles
+                        className="absolute inset-0 -z-10 opacity-0 transition-opacity duration-1000 ease-in-out group-hover:opacity-100"
+                        quantity={50}
+                        color={"hsl(var(--primary))"}
+                        vy={-0.1}
+                        vx={0.1}
+                    />
+                    <div className="flex items-start gap-4">
+                        <div className="flex-shrink-0 bg-primary/10 p-3 rounded-full transition-all duration-300 group-hover:bg-primary group-hover:scale-110">
+                        {item.icon}
+                        </div>
+                        <div>
+                        <h3 className="text-lg font-semibold">{item.title}</h3>
+                        <p className="text-muted-foreground mt-1">
+                            {item.description}
+                        </p>
+                        </div>
+                    </div>
+                    </div>
+                </HighlighterItem>
+                </div>
+            ))}
+            </HighlightGroup>
+        </div>
       </div>
     </section>
   );
