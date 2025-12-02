@@ -49,9 +49,9 @@ export function Differentials() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-stretch">
             {/* Left Column */}
-            <div className="space-y-10">
+            <div className="space-y-10 flex flex-col justify-center">
                 {differentialsData.slice(0, 2).map((item) => (
                     <div key={item.title} className="flex items-start gap-4">
                         <div className="flex-shrink-0 bg-primary/10 p-3 rounded-full">
@@ -66,13 +66,12 @@ export function Differentials() {
             </div>
 
             {/* Center Image */}
-            <div className="my-8 lg:my-0">
+            <div className="my-8 lg:my-0 relative min-h-[300px]">
                 {vehiclesImage && (
                     <Image
                         src={vehiclesImage.imageUrl}
                         alt={vehiclesImage.description}
-                        width={600}
-                        height={400}
+                        fill
                         className="rounded-lg object-contain mx-auto"
                         data-ai-hint={vehiclesImage.imageHint}
                     />
@@ -80,7 +79,7 @@ export function Differentials() {
             </div>
 
             {/* Right Column */}
-            <div className="space-y-10">
+            <div className="space-y-10 flex flex-col justify-center">
                 {differentialsData.slice(2, 4).map((item) => (
                      <div key={item.title} className="flex items-start gap-4">
                         <div className="flex-shrink-0 bg-primary/10 p-3 rounded-full">
