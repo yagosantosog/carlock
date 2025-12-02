@@ -7,6 +7,7 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/s
 import { CarLockLogo } from "@/components/icons/logo";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 const navLinks = [
   { href: "#features", label: "Serviços" },
@@ -38,7 +39,13 @@ export function Header() {
     )}>
       <div className="container mx-auto px-4 flex h-14 items-center justify-between">
         <Link href="/" className="flex items-center space-x-2">
-            <CarLockLogo className={cn("h-6 w-6", isScrolled ? "text-primary" : "text-white")} />
+            <Image
+              src={isScrolled ? "/logo.png" : "/logo_1.png"}
+              alt="CarLock Logo"
+              width={24}
+              height={24}
+              className="h-6 w-6"
+            />
             <span className={cn("font-bold", isScrolled ? "text-foreground" : "text-white")}>CarLock</span>
         </Link>
         
@@ -76,7 +83,7 @@ export function Header() {
               <div className="flex flex-col h-full">
                 <div className="flex items-center justify-between p-4 border-b">
                    <Link href="/" className="flex items-center space-x-2" onClick={() => setIsMenuOpen(false)}>
-                      <CarLockLogo className="h-6 w-6 text-primary" />
+                      <Image src="/logo.png" alt="CarLock Logo" width={24} height={24} className="h-6 w-6" />
                       <span className="font-bold">CarLock</span>
                    </Link>
                    <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(false)}>
