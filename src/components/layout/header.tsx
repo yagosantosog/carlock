@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 
 const navLinks = [
   { href: "#features", label: "Recursos" },
+  { href: "#about", label: "Sobre Nós" },
   { href: "#differentials", label: "Diferenciais" },
   { href: "#services", label: "Serviços" },
 ];
@@ -36,12 +37,10 @@ export function Header() {
         isScrolled ? "border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" : "bg-transparent"
     )}>
       <div className="container mx-auto px-4 flex h-14 items-center justify-between">
-        <div className="flex items-center">
-          <Link href="/" className="flex items-center space-x-2">
+        <Link href="/" className="flex items-center space-x-2">
             <CarLockLogo className={cn("h-6 w-6", isScrolled ? "text-primary" : "text-white")} />
             <span className={cn("font-bold", isScrolled ? "text-foreground" : "text-white")}>CarLock</span>
-          </Link>
-        </div>
+        </Link>
         
         <div className="flex items-center gap-6">
           <nav className="hidden gap-6 md:flex">
