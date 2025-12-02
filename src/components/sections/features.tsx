@@ -73,13 +73,13 @@ export function Features() {
           </div>
           {/* Image Column */}
           <div className="flex justify-center p-8 lg:order-first">
-            <div className="relative aspect-square w-full max-w-md">
+            <div className="relative aspect-square w-full max-w-md rounded-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
               {featuresImage && (
                 <Image
                   src={featuresImage.imageUrl}
                   alt={featuresImage.description}
                   fill
-                  className="rounded-lg object-cover"
+                  className="object-cover"
                   data-ai-hint={featuresImage.imageHint}
                 />
               )}
