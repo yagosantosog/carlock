@@ -49,7 +49,7 @@ export function Differentials() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-center">
             {/* Left Column */}
             <div className="space-y-10 flex flex-col justify-center">
                 {differentialsData.slice(0, 2).map((item) => (
@@ -71,8 +71,8 @@ export function Differentials() {
                     <Image
                         src={differentialsImage.imageUrl}
                         alt={differentialsImage.description}
-                        width={350}
-                        height={350}
+                        width={450}
+                        height={450}
                         className="rounded-lg object-contain"
                         data-ai-hint={differentialsImage.imageHint}
                     />
