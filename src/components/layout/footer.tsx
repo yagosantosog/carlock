@@ -37,22 +37,21 @@ const menuItems: MenuItem[] = [
       ],
     },
     {
-      title: "Social",
+      title: "SOCIAL",
       links: [
-        { text: "Facebook", url: "#" },
-        { text: "Instagram", url: "#" },
+        { text: "Facebook", url: "#", isExternal: true },
+        { text: "Instagram", url: "#", isExternal: true },
       ],
     },
   ];
 
 const copyright = `© ${new Date().getFullYear()} CarLock. Todos os direitos reservados.`;
 
-
 export function Footer() {
   return (
-    <footer className="bg-zinc-900 text-background py-16 sm:py-24">
-      <div className="container">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+    <footer className="bg-zinc-900 text-background">
+      <div className="container py-16 sm:py-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
             <div className="col-span-1 md:col-span-2 lg:col-span-2 mb-8 lg:mb-0">
                <Link href="/" className="flex items-center gap-2">
                   <Image src="/logo_1.png" alt="CarLock Logo" width={160} height={40} />
@@ -62,38 +61,29 @@ export function Footer() {
               </p>
             </div>
             
-            {menuItems.slice(0, 2).map((section) => (
+            {menuItems.map((section) => (
               <div key={section.title}>
-                <h3 className="mb-4 font-bold text-white">{section.title}</h3>
+                <h3 className="mb-4 font-bold text-white uppercase">{section.title}</h3>
                 <ul className="space-y-3">
                   {section.links.map((link) => (
                     <li key={link.text} className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
-                      <Link href={link.url}>{link.text}</Link>
+                      <Link href={link.url} target={link.isExternal ? "_blank" : undefined}>
+                        {link.title === 'INFORMAÇÕES' || link.title === 'SOCIAL' ? (
+                            <div className="flex items-center gap-2">
+                                {link.text === "Facebook" && <Facebook className="h-5 w-5" />}
+                                {link.text === "Instagram" && <Instagram className="h-5 w-5" />}
+                                {link.title === 'INFORMAÇÕES' && <Phone className="w-4 h-4"/>}
+                                <span>{link.text}</span>
+                            </div>
+                        ) : (
+                           link.text
+                        )}
+                      </Link>
                     </li>
                   ))}
                 </ul>
               </div>
             ))}
-
-             <div>
-                <h3 className="mb-4 font-bold text-white">CONTATO</h3>
-                <ul className="space-y-3">
-                    <li className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
-                        <Link href="https://api.whatsapp.com/send?phone=5516993166262" target="_blank" className="flex items-center gap-2">
-                            <Phone className="w-4 h-4"/>
-                            <span>(16) 99316-6262</span>
-                        </Link>
-                    </li>
-                </ul>
-                <div className="flex items-center space-x-4 pt-4">
-                  <Link href="#" className="text-muted-foreground hover:text-primary" aria-label="Facebook">
-                    <Facebook className="h-5 w-5" />
-                  </Link>
-                  <Link href="#" className="text-muted-foreground hover:text-primary" aria-label="Instagram">
-                    <Instagram className="h-5 w-5" />
-                  </Link>
-                </div>
-              </div>
           </div>
           <div className="mt-24 flex flex-col justify-between gap-4 border-t border-gray-700 pt-8 text-sm font-medium text-muted-foreground md:flex-row md:items-center">
             <p>{copyright}</p>
