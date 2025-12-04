@@ -16,7 +16,7 @@ import dynamic from 'next/dynamic';
 
 const Editor = dynamic(() => import('./Editor').then((mod) => mod.Editor), {
   ssr: false,
-  loading: () => <p>Loading editor...</p>,
+  loading: () => <p>Carregando editor...</p>,
 });
 
 interface PostFormProps {
