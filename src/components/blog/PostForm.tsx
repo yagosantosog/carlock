@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
 import { Post } from '@/types/blog';
@@ -11,8 +11,13 @@ import { useAuth, useFirestore } from '@/firebase';
 import { collection, addDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { slugify } from '@/lib/utils';
-import { Editor } from './Editor';
 import { OutputData } from '@editorjs/editorjs';
+import dynamic from 'next/dynamic';
+
+const Editor = dynamic(() => import('./Editor').then((mod) => mod.Editor), {
+  ssr: false,
+  loading: () => <p>Loading editor...</p>,
+});
 
 interface PostFormProps {
   post?: Post;

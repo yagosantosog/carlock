@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useEffect, useRef } from 'react';
 import EditorJS, { OutputData } from '@editorjs/editorjs';
 import Header from '@editorjs/header';
@@ -13,12 +11,12 @@ interface EditorProps {
 
 export const Editor: React.FC<EditorProps> = ({ onChange, value }) => {
   const editorRef = useRef<EditorJS | null>(null);
-  const holder = `editorjs-${Math.random().toString(36).substring(7)}`;
+  const holderId = `editorjs-${Math.random().toString(36).substring(7)}`;
 
   useEffect(() => {
     if (!editorRef.current) {
       const editor = new EditorJS({
-        holder: holder,
+        holder: holderId,
         tools: {
           header: Header,
           list: List,
@@ -43,7 +41,8 @@ export const Editor: React.FC<EditorProps> = ({ onChange, value }) => {
         editorRef.current = null;
       }
     };
-  }, [value, onChange, holder]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  return <div id={holder} className="prose dark:prose-invert max-w-full" />;
+  return <div id={holderId} className="prose dark:prose-invert max-w-full" />;
 };
