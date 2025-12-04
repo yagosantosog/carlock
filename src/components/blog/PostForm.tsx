@@ -29,7 +29,7 @@ export function PostForm({ post }: PostFormProps) {
   const { user } = useAuth();
   const storage = getStorage();
   const { register, handleSubmit, setValue, watch, control, formState: { errors, isSubmitting } } = useForm<Post>({
-    defaultValues: post || { tags: [], author: user?.displayName || 'Anônimo' }
+    defaultValues: post || { tags: [] }
   });
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
 
@@ -40,9 +40,19 @@ export function PostForm({ post }: PostFormProps) {
       setValue('slug', slugify(title));
     }
   }, [title, setValue, post]);
+
+  // Set author when user object is available
+  useEffect(() => {
+    if (user && !post?.author) {
+      setValue('author', user.isAnonymous ? 'Anônimo' : user.displayName || 'Anônimo');
+    }
+  }, [user, post, setValue]);
   
   const onSubmit = async (data: Post) => {
-    if (!firestore || !user) return;
+    if (!firestore || !user) {
+      alert("Erro de autenticação. Por favor, recarregue a página.");
+      return;
+    }
 
     let coverImageUrl = post?.coverImage || '';
 
@@ -56,18 +66,20 @@ export function PostForm({ post }: PostFormProps) {
       ...data,
       coverImage: coverImageUrl,
       updatedAt: serverTimestamp(),
-      content: JSON.stringify(data.content)
+      content: JSON.stringify(data.content),
+      author: data.author || (user.isAnonymous ? 'Anônimo' : user.displayName || 'Anônimo')
     };
 
     try {
       if (post && post.id) {
         const postRef = doc(firestore, 'posts', post.id);
-        await updateDoc(postRef, postData);
+        await updateDoc(postRef, {
+          ...postData,
+        });
       } else {
         await addDoc(collection(firestore, 'posts'), {
           ...postData,
           createdAt: serverTimestamp(),
-          author: user?.displayName || 'Anônimo'
         });
       }
       router.push('/admin/blog');
@@ -102,7 +114,7 @@ export function PostForm({ post }: PostFormProps) {
             render={({ field }) => (
               <Editor
                 value={post?.content ? JSON.parse(post.content) : undefined}
-                onChange={(data) => field.onChange(data)}
+                onChange={(data) => field.onChange(data as any)}
               />
             )}
           />
