@@ -72,7 +72,7 @@ export function PostCard({ post, isAdmin = false }: PostCardProps) {
       </CardHeader>
       <CardContent className="flex-grow">
         <p className="text-muted-foreground text-sm mb-4">
-          {post.createdAt && format(post.createdAt.toDate(), "dd 'de' MMMM, yyyy", { locale: ptBR })} por {post.author}
+          {post.createdAt && format(new Date(post.createdAt as string), "dd 'de' MMMM, yyyy", { locale: ptBR })} por {post.author}
         </p>
         {!isAdmin && <p className="text-sm text-muted-foreground">{extractSummary(post.content)}</p>}
          {post.tags && (

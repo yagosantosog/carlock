@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { collection, query, where, getDocs, Timestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { useFirestore } from '@/firebase';
 import { Post } from '@/types/blog';
 import Image from 'next/image';
@@ -51,8 +51,9 @@ export default function PostPage({ params }: { params: { slug: string } }) {
     return <div className="container mx-auto py-10 text-center">Post não encontrado.</div>;
   }
 
-  const formatDate = (date: Timestamp) => {
-    return format(date.toDate(), "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
+  const formatDate = (date: string | Date) => {
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    return format(dateObj, "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
   };
 
   return (
@@ -60,7 +61,7 @@ export default function PostPage({ params }: { params: { slug: string } }) {
       <header className="mb-8">
         <h1 className="text-4xl md:text-5xl font-extrabold leading-tight mb-4">{post.title}</h1>
         <p className="text-muted-foreground">
-          Por {post.author} em {post.createdAt && formatDate(post.createdAt)}
+          Por {post.author} em {post.createdAt && formatDate(post.createdAt as string)}
         </p>
       </header>
       {post.coverImage && (
