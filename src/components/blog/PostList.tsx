@@ -1,8 +1,20 @@
-import { StrapiPost } from '@/types/blog';
 import { PostCard } from './PostCard';
 
+// Temporary simplified Post type
+interface Post {
+  id: string | number;
+  title: string;
+  slug: string;
+  author: string;
+  createdAt: string;
+  coverImage?: { url: string };
+  tags?: string[];
+  content?: any;
+}
+
+
 interface PostListProps {
-  posts: StrapiPost[];
+  posts: Post[];
   isAdmin?: boolean;
   onPostDeleted?: () => void;
 }

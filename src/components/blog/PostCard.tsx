@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { StrapiPost } from '@/types/blog';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
@@ -9,8 +8,21 @@ import { Badge } from '../ui/badge';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useToast } from '../ui/use-toast';
 
+// Temporary simplified Post type
+interface Post {
+  id: string | number;
+  title: string;
+  slug: string;
+  author: string;
+  createdAt: string;
+  coverImage?: { url: string };
+  tags?: string[];
+  content?: any;
+}
+
+
 interface PostCardProps {
-  post: StrapiPost;
+  post: Post;
   isAdmin?: boolean;
   onPostDeleted?: () => void;
 }
@@ -19,48 +31,20 @@ export function PostCard({ post, isAdmin = false, onPostDeleted }: PostCardProps
   const placeholder = PlaceHolderImages.find(p => p.id === 'blog-post-placeholder');
   const { toast } = useToast();
   
-  const { id, attributes } = post;
-  const { title, slug, author, createdAt, coverImage, content, tags } = attributes;
+  const { id, title, slug, author, createdAt, coverImage, tags, content } = post;
 
   const handleDelete = async () => {
-    if (!id) return;
-    if (window.confirm(`Tem certeza que deseja deletar o post "${title}"?`)) {
-      try {
-        // await deletePost(id.toString());
-        toast({ title: 'Função de deletar desabilitada.' });
-        if(onPostDeleted) onPostDeleted();
-      } catch (error) {
-        console.error("Erro ao deletar o post: ", error);
-        toast({
-          variant: 'destructive',
-          title: 'Ocorreu um erro ao deletar o post.',
-          description: 'Tente novamente mais tarde.'
-        });
-      }
-    }
+    toast({ title: 'Função de deletar desabilitada.' });
   };
   
   const postUrl = isAdmin ? `/admin/blog/${id}/edit` : `/blog/${slug}`;
   const linkText = isAdmin ? 'Editar' : 'Ler Mais';
   
-  const coverImageUrl = coverImage.data 
-    ? coverImage.data.attributes.url
-    : (placeholder?.imageUrl || '');
+  const coverImageUrl = coverImage?.url || placeholder?.imageUrl || '';
 
   const extractSummary = (content: any) => {
-     try {
-      if (typeof content === 'string') {
-        const parsedContent = JSON.parse(content);
-        const firstParagraph = parsedContent.blocks.find((block: any) => block.type === 'paragraph');
-        let text = firstParagraph?.data.text;
-        if(text) return text.substring(0, 150) + (text.length > 150 ? '...' : '');
-      }
-      return '';
-    } catch (e) {
-      console.error("Failed to parse content for summary", e);
-      return '';
-    }
-    return '';
+    // This function will no longer work as intended without a proper content structure
+    return "Clique para ler mais sobre este post...";
   };
 
   return (
@@ -88,10 +72,10 @@ export function PostCard({ post, isAdmin = false, onPostDeleted }: PostCardProps
           {createdAt && format(new Date(createdAt), "dd 'de' MMMM, yyyy", { locale: ptBR })} por {author}
         </p>
         {!isAdmin && <p className="text-sm text-muted-foreground">{extractSummary(content)}</p>}
-         {tags?.data && (
+         {tags && (
           <div className="mt-4 flex flex-wrap gap-2">
-            {tags.data.map((tag) => (
-              <Badge key={tag.id} variant="secondary">{tag.attributes.name}</Badge>
+            {tags.map((tag) => (
+              <Badge key={tag} variant="secondary">{tag}</Badge>
             ))}
           </div>
         )}

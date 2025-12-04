@@ -1,85 +1,38 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm, Controller } from 'react-hook-form';
-import { StrapiPost, StrapiPostForm } from '@/types/blog';
+import { useForm } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { slugify } from '@/lib/utils';
-import dynamic from 'next/dynamic';
 import { useToast } from '../ui/use-toast';
+import { Textarea } from '../ui/textarea';
 
-const Editor = dynamic(() => import('./Editor').then((mod) => mod.Editor), {
-  ssr: false,
-  loading: () => <p>Carregando editor...</p>,
-});
 
-interface PostFormProps {
-  post?: StrapiPost;
+interface PostFormValues {
+    title: string;
+    slug: string;
+    content: string;
+    author: string;
+    tags: string; // comma-separated
 }
 
-export function PostForm({ post }: PostFormProps) {
+export function PostForm() {
   const router = useRouter();
   const { toast } = useToast();
 
-  const defaultValues = post ? {
-    title: post.attributes.title,
-    slug: post.attributes.slug,
-    content: post.attributes.content,
-    author: post.attributes.author,
-    tags: post.attributes.tags?.data.map(t => t.attributes.name).join(', ') || ''
-  } : {
-    title: '',
-    slug: '',
-    content: '',
-    author: 'CarLock Admin',
-    tags: ''
-  };
-
-  const { register, handleSubmit, setValue, watch, control, formState: { errors, isSubmitting } } = useForm<StrapiPostForm>({
-    defaultValues
-  });
-  const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
-
-  const title = watch('title');
-
-  useEffect(() => {
-    if (title && !post) { 
-      setValue('slug', slugify(title));
-    }
-  }, [title, setValue, post]);
-
-  const onSubmit = async (data: StrapiPostForm) => {
-    try {
-      // Logic removed as it depended on Strapi
-      toast({
-        variant: "destructive",
-        title: "Funcionalidade desabilitada.",
-        description: 'A criação e edição de posts foi temporariamente desativada.',
-      });
-    } catch (e: any) {
-      console.error("Error saving post: ", e);
-      toast({
-        variant: "destructive",
-        title: "Ocorreu um erro ao salvar.",
-        description: e.message || 'Verifique os dados e tente novamente.',
-      });
-    }
-  };
-
-  let initialContent;
-  if(post?.attributes.content) {
-    try {
-       initialContent = typeof post.attributes.content === 'string'
-        ? JSON.parse(post.attributes.content)
-        : post.attributes.content;
-    } catch(e) {
-      initialContent = {}; // Fallback for invalid JSON
-    }
-  }
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<PostFormValues>();
   
+  const onSubmit = async (data: PostFormValues) => {
+    toast({
+      variant: "destructive",
+      title: "Funcionalidade desabilitada.",
+      description: 'A criação e edição de posts foi desativada.',
+    });
+  };
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div>
@@ -99,25 +52,11 @@ export function PostForm({ post }: PostFormProps) {
       </div>
       <div>
         <Label htmlFor="coverImage">Imagem de Capa</Label>
-        <Input id="coverImage" type="file" onChange={(e) => setCoverImageFile(e.target.files?.[0] || null)} />
-        {post?.attributes.coverImage.data && !coverImageFile && <img src={post.attributes.coverImage.data.attributes.url} alt="Capa atual" className="mt-2 h-32 object-cover" />}
+        <Input id="coverImage" type="file" />
       </div>
       <div>
         <Label>Conteúdo</Label>
-        <div className="mt-1 border rounded-md p-2 bg-background">
-          <Controller
-            name="content"
-            control={control}
-            rules={{ required: 'Conteúdo é obrigatório' }}
-            render={({ field }) => (
-               <Editor
-                value={initialContent}
-                onChange={(data) => field.onChange(JSON.stringify(data))}
-              />
-            )}
-          />
-        </div>
-         {errors.content && <p className="text-red-500 text-sm mt-1">{errors.content.message}</p>}
+         <Textarea {...register('content')} placeholder="Escreva o conteúdo do post aqui."/>
       </div>
       <div>
         <Label htmlFor="tags">Tags (separadas por vírgula)</Label>
@@ -127,7 +66,7 @@ export function PostForm({ post }: PostFormProps) {
         />
       </div>
       <Button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? 'Salvando...' : (post ? 'Atualizar Post' : 'Salvar Post')}
+        {isSubmitting ? 'Salvando...' : 'Salvar Post'}
       </Button>
     </form>
   );
