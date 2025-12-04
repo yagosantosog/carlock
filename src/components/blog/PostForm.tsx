@@ -7,12 +7,10 @@ import { Post } from '@/types/blog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { useAuth, useFirestore, errorEmitter } from '@/firebase';
-import { FirestorePermissionError } from '@/firebase/errors';
-import { collection, addDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { useUser, useFirestore } from '@/firebase';
+import { collection, addDoc, doc, updateDoc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { slugify } from '@/lib/utils';
-import { OutputData } from '@editorjs/editorjs';
 import dynamic from 'next/dynamic';
 import { useToast } from '../ui/use-toast';
 
@@ -28,7 +26,7 @@ interface PostFormProps {
 export function PostForm({ post }: PostFormProps) {
   const router = useRouter();
   const firestore = useFirestore();
-  const { user } = useAuth();
+  const { user } = useUser();
   const storage = getStorage();
   const { toast } = useToast();
 
@@ -40,15 +38,14 @@ export function PostForm({ post }: PostFormProps) {
   const title = watch('title');
 
   useEffect(() => {
-    if (title && !post) { // Only auto-generate slug for new posts
+    if (title && !post) { 
       setValue('slug', slugify(title));
     }
   }, [title, setValue, post]);
 
-  // Set author when user object is available
   useEffect(() => {
     if (user && !post?.author) {
-      setValue('author', user.isAnonymous ? 'Anônimo' : user.displayName || 'Anônimo');
+      setValue('author', user.displayName || user.email || 'Autor Desconhecido');
     }
   }, [user, post, setValue]);
   
@@ -57,7 +54,7 @@ export function PostForm({ post }: PostFormProps) {
       toast({
         variant: "destructive",
         title: "Erro de autenticação.",
-        description: "Por favor, recarregue a página e tente novamente.",
+        description: "Você precisa estar logado para salvar um post.",
       });
       return;
     }
@@ -75,7 +72,7 @@ export function PostForm({ post }: PostFormProps) {
         ? data.tags.map(t => String(t).trim()).filter(Boolean)
         : (typeof data.tags === 'string' ? data.tags.split(',').map(tag => tag.trim()).filter(Boolean) : []);
 
-      const contentString = typeof data.content === 'object'
+      const contentString = typeof data.content === 'object' && data.content !== null
         ? JSON.stringify(data.content)
         : String(data.content || '');
 
@@ -85,7 +82,7 @@ export function PostForm({ post }: PostFormProps) {
         title: String(data.title || ''),
         slug: String(data.slug || ''),
         content: contentString,
-        author: String(data.author || (user.isAnonymous ? 'Anônimo' : user.displayName || 'Anônimo')),
+        author: String(data.author || user.displayName || user.email),
         tags: normalizedTags,
         updatedAt: nowIso,
       };
@@ -97,37 +94,22 @@ export function PostForm({ post }: PostFormProps) {
 
       if (post && post.id) {
         const postRef = doc(firestore, 'posts', post.id);
-        updateDoc(postRef, postData).catch(error => {
-            errorEmitter.emit(
-              'permission-error',
-              new FirestorePermissionError({
-                path: postRef.path,
-                operation: 'update',
-                requestResourceData: postData,
-              })
-            )
-        });
+        await updateDoc(postRef, postData);
       } else {
         const collectionRef = collection(firestore, 'posts');
-        addDoc(collectionRef, {
+        await addDoc(collectionRef, {
           ...postData,
           createdAt: nowIso,
-        }).catch(error => {
-            errorEmitter.emit(
-              'permission-error',
-              new FirestorePermissionError({
-                path: collectionRef.path,
-                operation: 'create',
-                requestResourceData: { ...postData, createdAt: nowIso },
-              })
-            )
         });
       }
+
       toast({
         title: "Post salvo com sucesso!",
       });
+
       router.push('/admin/blog');
       router.refresh();
+
     } catch (e: any) {
       console.error("Error saving post: ", e);
       toast({
@@ -161,7 +143,7 @@ export function PostForm({ post }: PostFormProps) {
             name="content"
             control={control}
             render={({ field }) => (
-              <Editor
+               <Editor
                 value={post?.content && typeof post.content === 'string' ? JSON.parse(post.content) : undefined}
                 onChange={(data) => field.onChange(JSON.stringify(data))}
               />
