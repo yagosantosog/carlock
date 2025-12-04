@@ -21,6 +21,10 @@ const aboutData = [
 ]
 
 export function About() {
+  const startYear = 2011;
+  const currentYear = new Date().getFullYear();
+  const yearsOfExperience = currentYear - startYear;
+
   return (
     <section id="about" className="py-16 sm:py-24 bg-background">
       <div className="container mx-auto px-4">
@@ -28,11 +32,11 @@ export function About() {
           <div>
             <div className="text-center">
                 <h2 className="text-3xl font-bold tracking-tight sm:text-4xl font-headline relative pb-4">
-                    5 Anos de Experiência em Segurança e Tecnologia
+                    {yearsOfExperience} Anos de Experiência em Segurança e Tecnologia
                     <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-1 w-20 bg-primary"></span>
                 </h2>
                 <p className="mt-8 text-lg text-muted-foreground max-w-3xl mx-auto">
-                Somos uma empresa consolidada com 5 anos de experiência no mercado de rastreamento veicular. Nossa paixão é garantir sua segurança através de alta tecnologia, com agilidade e um atendimento que abrange todo o Brasil.
+                Desde 2011, somos uma empresa consolidada no mercado de rastreamento veicular. Nossa paixão é garantir sua segurança através de alta tecnologia, com agilidade e um atendimento que abrange todo o Brasil.
                 </p>
             </div>
 
