@@ -1,53 +1,68 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Post } from '@/types/blog';
+import { StrapiPost } from '@/types/blog';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Badge } from '../ui/badge';
-import { deleteDoc, doc } from 'firebase/firestore';
-import { useFirestore } from '@/firebase';
-import { getStorage, ref, deleteObject } from 'firebase/storage';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { getStrapiURL } from '@/lib/utils';
+import { deletePost } from '@/lib/strapi';
+import { useToast } from '../ui/use-toast';
 
 interface PostCardProps {
-  post: Post;
+  post: StrapiPost;
   isAdmin?: boolean;
+  onPostDeleted?: () => void;
 }
 
-export function PostCard({ post, isAdmin = false }: PostCardProps) {
-  const firestore = useFirestore();
-  const storage = getStorage();
+export function PostCard({ post, isAdmin = false, onPostDeleted }: PostCardProps) {
   const placeholder = PlaceHolderImages.find(p => p.id === 'blog-post-placeholder');
+  const { toast } = useToast();
+  
+  const { id, attributes } = post;
+  const { title, slug, author, createdAt, coverImage, content, tags } = attributes;
 
   const handleDelete = async () => {
-    if (!firestore || !post.id) return;
-    if (window.confirm(`Tem certeza que deseja deletar o post "${post.title}"?`)) {
+    if (!id) return;
+    if (window.confirm(`Tem certeza que deseja deletar o post "${title}"?`)) {
       try {
-        await deleteDoc(doc(firestore, 'posts', post.id));
-        if (post.coverImage) {
-          const imageRef = ref(storage, post.coverImage);
-          await deleteObject(imageRef);
-        }
+        await deletePost(id.toString());
+        toast({ title: 'Post deletado com sucesso!' });
+        if(onPostDeleted) onPostDeleted();
       } catch (error) {
         console.error("Erro ao deletar o post: ", error);
-        alert("Ocorreu um erro ao deletar o post.");
+        toast({
+          variant: 'destructive',
+          title: 'Ocorreu um erro ao deletar o post.',
+          description: 'Tente novamente mais tarde.'
+        });
       }
     }
   };
   
-  const postUrl = isAdmin ? `/admin/blog/${post.id}/edit` : `/blog/${post.slug}`;
+  const postUrl = isAdmin ? `/admin/blog/${id}/edit` : `/blog/${slug}`;
   const linkText = isAdmin ? 'Editar' : 'Ler Mais';
+  
+  const coverImageUrl = coverImage.data 
+    ? getStrapiURL(coverImage.data.attributes.url) 
+    : (placeholder?.imageUrl || '');
 
   const extractSummary = (content: any) => {
-    try {
-      const data = JSON.parse(content);
-      const firstParagraph = data.blocks.find((block: any) => block.type === 'paragraph');
-      return firstParagraph?.data.text.substring(0, 150) + '...' || '';
+     try {
+      if (typeof content === 'string') {
+        const parsedContent = JSON.parse(content);
+        const firstParagraph = parsedContent.blocks.find((block: any) => block.type === 'paragraph');
+        let text = firstParagraph?.data.text;
+        if(text) return text.substring(0, 150) + (text.length > 150 ? '...' : '');
+      }
+      return '';
     } catch (e) {
+      console.error("Failed to parse content for summary", e);
       return '';
     }
+    return '';
   };
 
   return (
@@ -55,8 +70,8 @@ export function PostCard({ post, isAdmin = false }: PostCardProps) {
       <Link href={postUrl}>
         <div className="relative w-full h-48">
           <Image
-            src={post.coverImage || placeholder?.imageUrl || ''}
-            alt={post.title}
+            src={coverImageUrl}
+            alt={title}
             layout="fill"
             objectFit="cover"
             className="transition-transform duration-300 group-hover:scale-105"
@@ -66,19 +81,19 @@ export function PostCard({ post, isAdmin = false }: PostCardProps) {
       <CardHeader>
         <CardTitle className="text-xl font-bold leading-snug">
           <Link href={postUrl} className="hover:text-primary transition-colors">
-            {post.title}
+            {title}
           </Link>
         </CardTitle>
       </CardHeader>
       <CardContent className="flex-grow">
         <p className="text-muted-foreground text-sm mb-4">
-          {post.createdAt && format(new Date(post.createdAt as string), "dd 'de' MMMM, yyyy", { locale: ptBR })} por {post.author}
+          {createdAt && format(new Date(createdAt), "dd 'de' MMMM, yyyy", { locale: ptBR })} por {author}
         </p>
-        {!isAdmin && <p className="text-sm text-muted-foreground">{extractSummary(post.content)}</p>}
-         {post.tags && (
+        {!isAdmin && <p className="text-sm text-muted-foreground">{extractSummary(content)}</p>}
+         {tags?.data && (
           <div className="mt-4 flex flex-wrap gap-2">
-            {post.tags.map((tag) => (
-              <Badge key={tag} variant="secondary">{tag}</Badge>
+            {tags.data.map((tag) => (
+              <Badge key={tag.id} variant="secondary">{tag.attributes.name}</Badge>
             ))}
           </div>
         )}

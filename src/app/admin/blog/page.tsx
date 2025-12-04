@@ -1,31 +1,34 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
-import { useFirestore } from '@/firebase';
-import { Post } from '@/types/blog';
+import { getPosts } from '@/lib/strapi';
+import { StrapiPost } from '@/types/blog';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { PostList } from '@/components/blog/PostList';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function AdminBlogPage() {
-  const firestore = useFirestore();
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [posts, setPosts] = useState<StrapiPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchPosts = async () => {
+    try {
+      setLoading(true);
+      const postsData = await getPosts();
+      setPosts(postsData);
+    } catch (err) {
+      setError('Falha ao carregar os posts.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    if (!firestore) return;
-
-    const q = query(collection(firestore, 'posts'), orderBy('createdAt', 'desc'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const postsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post));
-      setPosts(postsData);
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [firestore]);
+    fetchPosts();
+  }, []);
 
   return (
     <div className="container mx-auto py-10 px-4">
@@ -47,8 +50,10 @@ export default function AdminBlogPage() {
             </div>
           ))}
         </div>
+      ) : error ? (
+        <p className="text-center text-red-500">{error}</p>
       ) : (
-        <PostList posts={posts} isAdmin />
+        <PostList posts={posts} isAdmin onPostDeleted={fetchPosts} />
       )}
     </div>
   );

@@ -3,16 +3,14 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
-import { Post } from '@/types/blog';
+import { StrapiPost, StrapiPostForm } from '@/types/blog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { useUser, useFirestore } from '@/firebase';
-import { collection, addDoc, doc, updateDoc } from 'firebase/firestore';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { slugify } from '@/lib/utils';
 import dynamic from 'next/dynamic';
 import { useToast } from '../ui/use-toast';
+import { createPost, updatePost } from '@/lib/strapi';
 
 const Editor = dynamic(() => import('./Editor').then((mod) => mod.Editor), {
   ssr: false,
@@ -20,18 +18,29 @@ const Editor = dynamic(() => import('./Editor').then((mod) => mod.Editor), {
 });
 
 interface PostFormProps {
-  post?: Post;
+  post?: StrapiPost;
 }
 
 export function PostForm({ post }: PostFormProps) {
   const router = useRouter();
-  const firestore = useFirestore();
-  const { user } = useUser();
-  const storage = getStorage();
   const { toast } = useToast();
 
-  const { register, handleSubmit, setValue, watch, control, formState: { errors, isSubmitting } } = useForm<Post>({
-    defaultValues: post || { tags: [] }
+  const defaultValues = post ? {
+    title: post.attributes.title,
+    slug: post.attributes.slug,
+    content: post.attributes.content,
+    author: post.attributes.author,
+    tags: post.attributes.tags?.data.map(t => t.attributes.name).join(', ') || ''
+  } : {
+    title: '',
+    slug: '',
+    content: '',
+    author: 'CarLock Admin',
+    tags: ''
+  };
+
+  const { register, handleSubmit, setValue, watch, control, formState: { errors, isSubmitting } } = useForm<StrapiPostForm>({
+    defaultValues
   });
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
 
@@ -43,69 +52,31 @@ export function PostForm({ post }: PostFormProps) {
     }
   }, [title, setValue, post]);
 
-  useEffect(() => {
-    if (user && !post?.author) {
-      setValue('author', user.displayName || user.email || 'Autor Desconhecido');
-    }
-  }, [user, post, setValue]);
-  
-  const onSubmit = async (data: Post) => {
-    if (!firestore || !user) {
-      toast({
-        variant: "destructive",
-        title: "Erro de autenticação.",
-        description: "Você precisa estar logado para salvar um post.",
-      });
-      return;
-    }
-
+  const onSubmit = async (data: StrapiPostForm) => {
     try {
-      let coverImageUrl = post?.coverImage || undefined;
-
-      if (coverImageFile) {
-        const storageRef = ref(storage, `blog-covers/${Date.now()}_${coverImageFile.name}`);
-        await uploadBytes(storageRef, coverImageFile);
-        coverImageUrl = await getDownloadURL(storageRef);
-      }
+      const formData = new FormData();
       
-      const normalizedTags = Array.isArray(data.tags)
-        ? data.tags.map(t => String(t).trim()).filter(Boolean)
-        : (typeof data.tags === 'string' ? data.tags.split(',').map(tag => tag.trim()).filter(Boolean) : []);
-
-      const contentString = typeof data.content === 'object' && data.content !== null
-        ? JSON.stringify(data.content)
-        : String(data.content || '');
-
-      const nowIso = new Date().toISOString();
-
       const postData: any = {
-        title: String(data.title || ''),
-        slug: String(data.slug || ''),
-        content: contentString,
-        author: String(data.author || user.displayName || user.email),
-        tags: normalizedTags,
-        updatedAt: nowIso,
+        title: data.title,
+        slug: data.slug,
+        content: data.content, // Already a string from the editor
+        author: data.author,
+        tags: data.tags.split(',').map(tag => tag.trim()).filter(Boolean),
       };
 
-      if (coverImageUrl) {
-        postData.coverImage = coverImageUrl;
+      formData.append('data', JSON.stringify(postData));
+
+      if (coverImageFile) {
+        formData.append('files.coverImage', coverImageFile, coverImageFile.name);
       }
 
-
-      if (post && post.id) {
-        const postRef = doc(firestore, 'posts', post.id);
-        await updateDoc(postRef, postData);
+      if (post) {
+        await updatePost(post.id, formData);
+        toast({ title: "Post atualizado com sucesso!" });
       } else {
-        const collectionRef = collection(firestore, 'posts');
-        await addDoc(collectionRef, {
-          ...postData,
-          createdAt: nowIso,
-        });
+        await createPost(formData);
+        toast({ title: "Post criado com sucesso!" });
       }
-
-      toast({
-        title: "Post salvo com sucesso!",
-      });
 
       router.push('/admin/blog');
       router.refresh();
@@ -115,11 +86,22 @@ export function PostForm({ post }: PostFormProps) {
       toast({
         variant: "destructive",
         title: "Ocorreu um erro ao salvar.",
-        description: `${e?.code || ''} ${e?.message || String(e)}`,
+        description: e.message || 'Verifique os dados e tente novamente.',
       });
     }
   };
 
+  let initialContent;
+  if(post?.attributes.content) {
+    try {
+       initialContent = typeof post.attributes.content === 'string'
+        ? JSON.parse(post.attributes.content)
+        : post.attributes.content;
+    } catch(e) {
+      initialContent = {}; // Fallback for invalid JSON
+    }
+  }
+  
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div>
@@ -129,12 +111,18 @@ export function PostForm({ post }: PostFormProps) {
       </div>
       <div>
         <Label htmlFor="slug">Slug</Label>
-        <Input id="slug" {...register('slug', { required: 'Slug é obrigatório' })} readOnly />
+        <Input id="slug" {...register('slug', { required: 'Slug é obrigatório' })} />
+         {errors.slug && <p className="text-red-500 text-sm mt-1">{errors.slug.message}</p>}
+      </div>
+       <div>
+        <Label htmlFor="author">Autor</Label>
+        <Input id="author" {...register('author', { required: 'Autor é obrigatório' })} />
+        {errors.author && <p className="text-red-500 text-sm mt-1">{errors.author.message}</p>}
       </div>
       <div>
         <Label htmlFor="coverImage">Imagem de Capa</Label>
         <Input id="coverImage" type="file" onChange={(e) => setCoverImageFile(e.target.files?.[0] || null)} />
-        {post?.coverImage && !coverImageFile && <img src={post.coverImage} alt="Capa atual" className="mt-2 h-32 object-cover" />}
+        {post?.attributes.coverImage.data && !coverImageFile && <img src={`${process.env.NEXT_PUBLIC_STRAPI_URL || ''}${post.attributes.coverImage.data.attributes.url}`} alt="Capa atual" className="mt-2 h-32 object-cover" />}
       </div>
       <div>
         <Label>Conteúdo</Label>
@@ -142,35 +130,26 @@ export function PostForm({ post }: PostFormProps) {
           <Controller
             name="content"
             control={control}
+            rules={{ required: 'Conteúdo é obrigatório' }}
             render={({ field }) => (
                <Editor
-                value={post?.content && typeof post.content === 'string' ? JSON.parse(post.content) : undefined}
+                value={initialContent}
                 onChange={(data) => field.onChange(JSON.stringify(data))}
               />
             )}
           />
         </div>
+         {errors.content && <p className="text-red-500 text-sm mt-1">{errors.content.message}</p>}
       </div>
       <div>
         <Label htmlFor="tags">Tags (separadas por vírgula)</Label>
-        <Controller
-          name="tags"
-          control={control}
-          defaultValue={[]}
-          render={({ field }) => (
-            <Input 
-              id="tags" 
-              value={Array.isArray(field.value) ? field.value.join(', ') : ''}
-              onChange={(e) => {
-                const tags = e.target.value.split(',').map(tag => tag.trim());
-                field.onChange(tags);
-              }}
-            />
-          )}
+        <Input 
+          id="tags" 
+          {...register('tags')}
         />
       </div>
       <Button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? 'Salvando...' : 'Salvar Post'}
+        {isSubmitting ? 'Salvando...' : (post ? 'Atualizar Post' : 'Salvar Post')}
       </Button>
     </form>
   );

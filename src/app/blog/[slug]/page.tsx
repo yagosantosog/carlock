@@ -1,36 +1,43 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { collection, query, where, getDocs } from 'firebase/firestore';
-import { useFirestore } from '@/firebase';
-import { Post } from '@/types/blog';
+import { getPostBySlug } from '@/lib/strapi';
+import { StrapiPost } from '@/types/blog';
 import Image from 'next/image';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { ContentRenderer } from '@/components/blog/ContentRenderer';
+import { getStrapiURL } from '@/lib/utils';
 
 export default function PostPage({ params }: { params: { slug: string } }) {
-  const firestore = useFirestore();
-  const [post, setPost] = useState<Post | null>(null);
+  const [post, setPost] = useState<StrapiPost | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!firestore) return;
+    if (!params.slug) return;
 
     const fetchPost = async () => {
-      const q = query(collection(firestore, 'posts'), where('slug', '==', params.slug));
-      const querySnapshot = await getDocs(q);
-      if (!querySnapshot.empty) {
-        const doc = querySnapshot.docs[0];
-        setPost({ id: doc.id, ...doc.data() } as Post);
+      try {
+        setLoading(true);
+        const postData = await getPostBySlug(params.slug);
+        if (postData) {
+          setPost(postData);
+        } else {
+          setError('Post não encontrado.');
+        }
+      } catch (err) {
+        setError('Falha ao carregar o post.');
+        console.error(err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchPost();
-  }, [firestore, params.slug]);
+  }, [params.slug]);
 
   if (loading) {
     return (
@@ -47,36 +54,39 @@ export default function PostPage({ params }: { params: { slug: string } }) {
     );
   }
 
-  if (!post) {
-    return <div className="container mx-auto py-10 text-center">Post não encontrado.</div>;
+  if (error || !post) {
+    return <div className="container mx-auto py-10 text-center">{error || 'Post não encontrado.'}</div>;
   }
 
-  const formatDate = (date: string | Date) => {
-    const dateObj = typeof date === 'string' ? new Date(date) : date;
-    return format(dateObj, "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
+  const { title, author, createdAt, coverImage, content, tags } = post.attributes;
+
+  const formatDate = (date: string) => {
+    return format(new Date(date), "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
   };
+  
+  const coverImageUrl = coverImage.data ? getStrapiURL(coverImage.data.attributes.url) : '';
 
   return (
     <article className="container mx-auto py-10 px-4 max-w-4xl">
       <header className="mb-8">
-        <h1 className="text-4xl md:text-5xl font-extrabold leading-tight mb-4">{post.title}</h1>
+        <h1 className="text-4xl md:text-5xl font-extrabold leading-tight mb-4">{title}</h1>
         <p className="text-muted-foreground">
-          Por {post.author} em {post.createdAt && formatDate(post.createdAt as string)}
+          Por {author} em {formatDate(createdAt)}
         </p>
       </header>
-      {post.coverImage && (
+      {coverImageUrl && (
         <div className="relative w-full h-96 mb-8 rounded-lg overflow-hidden">
-          <Image src={post.coverImage} alt={post.title} layout="fill" objectFit="cover" />
+          <Image src={coverImageUrl} alt={title} layout="fill" objectFit="cover" />
         </div>
       )}
       <div className="prose prose-lg dark:prose-invert max-w-none mx-auto">
-        <ContentRenderer data={post.content} />
+        <ContentRenderer data={content} />
       </div>
-      {post.tags && post.tags.length > 0 && (
+      {tags?.data && tags.data.length > 0 && (
         <div className="mt-8">
-          {post.tags.map((tag) => (
-            <Badge key={tag} variant="secondary" className="mr-2 mb-2">
-              {tag}
+          {tags.data.map((tag) => (
+            <Badge key={tag.id} variant="secondary" className="mr-2 mb-2">
+              {tag.attributes.name}
             </Badge>
           ))}
         </div>
