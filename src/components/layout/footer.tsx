@@ -58,7 +58,7 @@ export function Footer() {
                   <Image src="/logo_1.png" alt="CarLock Logo" width={160} height={40} />
                </Link>
               <p className="mt-4 text-sm text-muted-foreground text-justify">
-                  Somos uma Empresa de Sistema de Rastreamento de Veículos situada no município de Franca-SP, com 5 anos de experiência no mercado e que busca oferecer seviços garatindo a segurança, diante a alta tecnologia, de forma ágil e sem preceitos. Realizamos atendimentos em todo Brasil.
+              Com base em Franca-SP, somos uma empresa de sistema de rastreamento veicular com vasta experiência no mercado. Oferecemos segurança com alta tecnologia e um atendimento ágil. Nossa loja é 100% virtual, o que nos permite atender clientes em todo o território nacional com a mesma eficiência.
               </p>
             </div>
             

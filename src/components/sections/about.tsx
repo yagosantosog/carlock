@@ -36,7 +36,7 @@ export function About() {
                     <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-1 w-20 bg-primary"></span>
                 </h2>
                 <p className="mt-8 text-lg text-muted-foreground max-w-3xl mx-auto">
-                Desde 2011, somos uma empresa consolidada no mercado de rastreamento veicular. Nossa paixão é garantir sua segurança através de alta tecnologia, com agilidade e um atendimento que abrange todo o Brasil.
+                Desde 2011, somos uma empresa consolidada no mercado de rastreamento veicular. Nossa paixão é garantir sua segurança através de alta tecnologia, com agilidade e um atendimento que abrange todo o Brasil, pois atuamos de forma 100% virtual, sem loja física.
                 </p>
             </div>
 
