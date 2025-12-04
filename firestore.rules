@@ -1,92 +1,16 @@
-/**
- * This ruleset enforces a "Public Read, Owner-Write" security model for a blog application.
- *
- * Core Philosophy:
- * The primary goal is to make all blog posts publicly readable by anyone, including anonymous users, while strictly controlling write access (creation, updates, and deletion). Only the original author of a post is permitted to modify or delete it. This ensures content integrity and prevents unauthorized changes.
- *
- * Data Structure:
- * The data is organized into a single top-level collection: `/posts`. Each document within this collection represents a single blog post and is identified by a unique `{postId}`.
- *
- * Key Security Decisions:
- * - Public Read Access: All documents in the `/posts` collection are globally readable (`get`, `list`) to support the public-facing blog.
- * - Authenticated, Owner-Only Writes: All write operations (`create`, `update`, `delete`) require user authentication. Furthermore, `update` and `delete` operations are restricted to the user whose UID matches the `author` field on the post document.
- * - Author Immutability: The `author` field is locked upon creation and cannot be changed during an update, securing the chain of ownership.
- *
- * Denormalization for Authorization:
- * To enable fast and secure ownership checks, this model requires that every post document contains an `author` field. This field must store the Firebase Authentication UID of the user who created it. This denormalization avoids costly and complex lookups, allowing rules to make an immediate authorization decision based on the document's own data.
- *
- * Structural Segregation:
- * Not applicable, as all posts follow the same public visibility model. There is no distinction between drafts and published content at the rules level.
- */
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // --- Helper Functions ---
-
-    /**
-     * Returns true if the user is authenticated.
-     */
+    // Helper functions
     function isSignedIn() {
       return request.auth != null;
     }
 
-    /**
-     * Returns true if the authenticated user's UID matches the provided userId.
-     * This is the core function for checking resource ownership.
-     */
-    function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
-    }
-
-    /**
-     * Validates that the user is the owner of an EXISTING document.
-     * Used for update and delete operations to prevent modifying non-existent data.
-     */
-    function isExistingOwner(userId) {
-      return resource != null && isOwner(userId);
-    }
-
-    /**
-     * Validates that the incoming document for a 'create' operation correctly
-     * assigns the current authenticated user as the author.
-     */
-    function isNewOwner() {
-      return isSignedIn() && request.resource.data.author == request.auth.uid;
-    }
-
-    /**
-     * Validates that a field is immutable and cannot be changed during an update.
-     * This is critical for preventing ownership transfers.
-     */
-    function isAuthorUnchanged() {
-      return request.resource.data.author == resource.data.author;
-    }
-
-    /**
-     * @description Controls access to blog posts. All posts are public to read,
-     * but can only be created, updated, or deleted by their original author.
-     * @path /posts/{postId}
-     * @allow (get) Any anonymous user reads a specific post.
-     * @allow (list) Any user, signed-in or not, lists all posts for the main blog page.
-     * @allow (create) A signed-in user creates a new post, correctly setting the 'author' field to their own UID.
-     * @deny (update) A signed-in user attempts to update a post written by another user.
-     * @deny (create) An anonymous user attempts to create a post.
-     * @principle Enforces a "Public Read, Owner-Write" security model. It relies on a denormalized `author` field (containing the user's UID) on each post document to make authorization decisions.
-     */
+    // Rules for posts collection
     match /posts/{postId} {
-      // READ: Anyone, including anonymous users, can read blog posts.
-      allow get: if true;
-      allow list: if true;
-
-      // CREATE: Any signed-in user can create a post, but they must set themselves as the author.
-      allow create: if isNewOwner();
-
-      // UPDATE: Only the original author can update their post, and the author field cannot be changed.
-      allow update: if isExistingOwner(resource.data.author) && isAuthorUnchanged();
-
-      // DELETE: Only the original author can delete their post.
-      allow delete: if isExistingOwner(resource.data.author);
+      allow read: if true;
+      allow write: if isSignedIn();
     }
   }
 }

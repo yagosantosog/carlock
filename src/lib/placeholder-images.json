@@ -71,6 +71,12 @@
       "description": "A person riding a motorcycle on a road next to a lake and mountains.",
       "imageUrl": "https://images.unsplash.com/photo-1593721396225-5f7823a0d33b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxtb3RvcmN5Y2xlJTIwcm9hZCUyMGxha2V8ZW58MHx8fHwxNzY1MTc0MTMxfDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "motorcycle road lake"
+    },
+    {
+      "id": "blog-post-placeholder",
+      "description": "Placeholder for blog posts",
+      "imageUrl": "https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxhYnN0cmFjdHxlbnwwfHx8fDE3NjQ4NTg5MTZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "abstract"
     }
   ]
 }
