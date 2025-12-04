@@ -7,12 +7,14 @@ import { Post } from '@/types/blog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { useAuth, useFirestore } from '@/firebase';
+import { useAuth, useFirestore, errorEmitter } from '@/firebase';
+import { FirestorePermissionError } from '@/firebase/errors';
 import { collection, addDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { slugify } from '@/lib/utils';
 import { OutputData } from '@editorjs/editorjs';
 import dynamic from 'next/dynamic';
+import { useToast } from '../ui/use-toast';
 
 const Editor = dynamic(() => import('./Editor').then((mod) => mod.Editor), {
   ssr: false,
@@ -28,6 +30,8 @@ export function PostForm({ post }: PostFormProps) {
   const firestore = useFirestore();
   const { user } = useAuth();
   const storage = getStorage();
+  const { toast } = useToast();
+
   const { register, handleSubmit, setValue, watch, control, formState: { errors, isSubmitting } } = useForm<Post>({
     defaultValues: post || { tags: [] }
   });
@@ -50,7 +54,11 @@ export function PostForm({ post }: PostFormProps) {
   
   const onSubmit = async (data: Post) => {
     if (!firestore || !user) {
-      alert("Erro de autenticação. Por favor, recarregue a página.");
+      toast({
+        variant: "destructive",
+        title: "Erro de autenticação.",
+        description: "Por favor, recarregue a página e tente novamente.",
+      });
       return;
     }
 
@@ -75,19 +83,46 @@ export function PostForm({ post }: PostFormProps) {
 
       if (post && post.id) {
         const postRef = doc(firestore, 'posts', post.id);
-        await updateDoc(postRef, {
+        updateDoc(postRef, {
           ...postData,
+        }).catch(error => {
+            errorEmitter.emit(
+              'permission-error',
+              new FirestorePermissionError({
+                path: postRef.path,
+                operation: 'update',
+                requestResourceData: postData,
+              })
+            )
         });
       } else {
-        await addDoc(collection(firestore, 'posts'), {
+        const collectionRef = collection(firestore, 'posts');
+        addDoc(collectionRef, {
           ...postData,
           createdAt: serverTimestamp(),
+        }).catch(error => {
+            errorEmitter.emit(
+              'permission-error',
+              new FirestorePermissionError({
+                path: collectionRef.path,
+                operation: 'create',
+                requestResourceData: postData,
+              })
+            )
         });
       }
+      toast({
+        title: "Post salvo com sucesso!",
+      });
       router.push('/admin/blog');
+      router.refresh();
     } catch (e: any) {
       console.error("Error saving post: ", e);
-      alert(`Ocorreu um erro ao salvar: ${e.message}`);
+      toast({
+        variant: "destructive",
+        title: "Ocorreu um erro ao salvar.",
+        description: e.message,
+      });
     }
   };
 
@@ -116,7 +151,7 @@ export function PostForm({ post }: PostFormProps) {
             render={({ field }) => (
               <Editor
                 value={post?.content && typeof post.content === 'string' ? JSON.parse(post.content) : undefined}
-                onChange={(data) => field.onChange(data as any)}
+                onChange={(data) => field.onChange(JSON.stringify(data))}
               />
             )}
           />

@@ -1,7 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import EditorJS, { OutputData } from '@editorjs/editorjs';
+// @ts-ignore
 import Header from '@editorjs/header';
+// @ts-ignore
 import List from '@editorjs/list';
+// @ts-ignore
 import Paragraph from '@editorjs/paragraph';
 
 interface EditorProps {
