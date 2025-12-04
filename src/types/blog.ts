@@ -6,8 +6,8 @@ export interface Post {
   slug: string;
   coverImage?: string;
   content: any; // Editor.js data
-  tags: string[];
+  tags: string[] | string;
   author: string;
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
+  createdAt: Timestamp | string;
+  updatedAt: Timestamp | string;
 }

@@ -63,7 +63,7 @@ export function PostForm({ post }: PostFormProps) {
     }
 
     try {
-      let coverImageUrl = post?.coverImage || '';
+      let coverImageUrl = post?.coverImage || undefined;
 
       if (coverImageFile) {
         const storageRef = ref(storage, `blog-covers/${Date.now()}_${coverImageFile.name}`);
@@ -71,21 +71,33 @@ export function PostForm({ post }: PostFormProps) {
         coverImageUrl = await getDownloadURL(storageRef);
       }
       
-      const postData = {
-        ...data,
-        coverImage: coverImageUrl,
-        updatedAt: serverTimestamp(),
-        // Ensure content is stringified before sending to Firestore
-        content: typeof data.content === 'object' ? JSON.stringify(data.content) : data.content,
-        author: data.author || (user.isAnonymous ? 'Anônimo' : user.displayName || 'Anônimo')
+      const normalizedTags = Array.isArray(data.tags)
+        ? data.tags.map(t => String(t).trim()).filter(Boolean)
+        : (typeof data.tags === 'string' ? data.tags.split(',').map(tag => tag.trim()).filter(Boolean) : []);
+
+      const contentString = typeof data.content === 'object'
+        ? JSON.stringify(data.content)
+        : String(data.content || '');
+
+      const nowIso = new Date().toISOString();
+
+      const postData: any = {
+        title: String(data.title || ''),
+        slug: String(data.slug || ''),
+        content: contentString,
+        author: String(data.author || (user.isAnonymous ? 'Anônimo' : user.displayName || 'Anônimo')),
+        tags: normalizedTags,
+        updatedAt: nowIso,
       };
+
+      if (coverImageUrl) {
+        postData.coverImage = coverImageUrl;
+      }
 
 
       if (post && post.id) {
         const postRef = doc(firestore, 'posts', post.id);
-        updateDoc(postRef, {
-          ...postData,
-        }).catch(error => {
+        updateDoc(postRef, postData).catch(error => {
             errorEmitter.emit(
               'permission-error',
               new FirestorePermissionError({
@@ -99,14 +111,14 @@ export function PostForm({ post }: PostFormProps) {
         const collectionRef = collection(firestore, 'posts');
         addDoc(collectionRef, {
           ...postData,
-          createdAt: serverTimestamp(),
+          createdAt: nowIso,
         }).catch(error => {
             errorEmitter.emit(
               'permission-error',
               new FirestorePermissionError({
                 path: collectionRef.path,
                 operation: 'create',
-                requestResourceData: postData,
+                requestResourceData: { ...postData, createdAt: nowIso },
               })
             )
         });
@@ -121,7 +133,7 @@ export function PostForm({ post }: PostFormProps) {
       toast({
         variant: "destructive",
         title: "Ocorreu um erro ao salvar.",
-        description: e.message,
+        description: `${e?.code || ''} ${e?.message || String(e)}`,
       });
     }
   };
@@ -159,11 +171,20 @@ export function PostForm({ post }: PostFormProps) {
       </div>
       <div>
         <Label htmlFor="tags">Tags (separadas por vírgula)</Label>
-        <Input 
-          id="tags" 
-          {...register('tags')}
-          onChange={(e) => setValue('tags', e.target.value.split(',').map(tag => tag.trim()))}
-          defaultValue={Array.isArray(post?.tags) ? post.tags.join(', ') : ''}
+        <Controller
+          name="tags"
+          control={control}
+          defaultValue={[]}
+          render={({ field }) => (
+            <Input 
+              id="tags" 
+              value={Array.isArray(field.value) ? field.value.join(', ') : ''}
+              onChange={(e) => {
+                const tags = e.target.value.split(',').map(tag => tag.trim());
+                field.onChange(tags);
+              }}
+            />
+          )}
         />
       </div>
       <Button type="submit" disabled={isSubmitting}>
