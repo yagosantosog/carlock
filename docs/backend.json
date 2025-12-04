@@ -1,0 +1,92 @@
+{
+  "entities": {
+    "Post": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Post",
+      "type": "object",
+      "description": "Represents a blog post.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Post entity."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the blog post."
+        },
+        "slug": {
+          "type": "string",
+          "description": "The slug of the blog post, generated from the title for URL-friendly access."
+        },
+        "coverImage": {
+          "type": "string",
+          "description": "URL of the cover image for the blog post.",
+          "format": "uri"
+        },
+        "content": {
+          "type": "string",
+          "description": "The content of the blog post, stored as JSON (Editor.js format)."
+        },
+        "tags": {
+          "type": "array",
+          "description": "An array of tags associated with the blog post.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "author": {
+          "type": "string",
+          "description": "The author of the blog post."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the blog post was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the blog post was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "slug",
+        "coverImage",
+        "content",
+        "tags",
+        "author",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/posts/{postId}",
+        "definition": {
+          "entityName": "Post",
+          "schema": {
+            "$ref": "#/backend/entities/Post"
+          },
+          "description": "Represents a blog post. Authenticated users can create, update, and delete posts; all users can read posts.",
+          "params": [
+            {
+              "name": "postId",
+              "description": "The unique identifier for the blog post."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "This Firestore structure is designed for a blog application with CRUD functionality, prioritizing security, scalability, and ease of debugging. It includes a single top-level collection, `posts`, where each document represents a blog post.  Authorization is enforced based on user authentication; only authenticated users can create, update, or delete posts. Public read access is granted to all.  This design uses path-based access with the collection `/posts/{postId}`.\n\n**Authorization Independence:**  The structure achieves authorization independence since create, update, and delete operations are limited to authenticated users via `request.auth != null`. There are no `get()` calls to other documents. Every post contains all the relevant information for displaying it and determining authorization.\n\n**QAPs:** The design supports QAPs (Rules Are Not Filters) by segregating data and using simple `read: true` and `write: request.auth != null` rules. The structure enables secure list operations, as there's no need to filter based on user roles or other document properties. All authenticated users can write, but the data model implicitly trusts that users will only modify their own posts via application-level logic.  Alternatively, to restrict writes to specific authors, you would need to include an `authorId` field in each post and ensure that `request.auth.uid == resource.data.authorId` in the Firestore rules."
+  }
+}
