@@ -54,23 +54,25 @@ export function PostForm({ post }: PostFormProps) {
       return;
     }
 
-    let coverImageUrl = post?.coverImage || '';
-
-    if (coverImageFile) {
-      const storageRef = ref(storage, `blog-covers/${Date.now()}_${coverImageFile.name}`);
-      await uploadBytes(storageRef, coverImageFile);
-      coverImageUrl = await getDownloadURL(storageRef);
-    }
-    
-    const postData = {
-      ...data,
-      coverImage: coverImageUrl,
-      updatedAt: serverTimestamp(),
-      content: JSON.stringify(data.content),
-      author: data.author || (user.isAnonymous ? 'Anônimo' : user.displayName || 'Anônimo')
-    };
-
     try {
+      let coverImageUrl = post?.coverImage || '';
+
+      if (coverImageFile) {
+        const storageRef = ref(storage, `blog-covers/${Date.now()}_${coverImageFile.name}`);
+        await uploadBytes(storageRef, coverImageFile);
+        coverImageUrl = await getDownloadURL(storageRef);
+      }
+      
+      const postData = {
+        ...data,
+        coverImage: coverImageUrl,
+        updatedAt: serverTimestamp(),
+        // Ensure content is stringified before sending to Firestore
+        content: typeof data.content === 'object' ? JSON.stringify(data.content) : data.content,
+        author: data.author || (user.isAnonymous ? 'Anônimo' : user.displayName || 'Anônimo')
+      };
+
+
       if (post && post.id) {
         const postRef = doc(firestore, 'posts', post.id);
         await updateDoc(postRef, {
@@ -83,9 +85,9 @@ export function PostForm({ post }: PostFormProps) {
         });
       }
       router.push('/admin/blog');
-    } catch (e) {
+    } catch (e: any) {
       console.error("Error saving post: ", e);
-      alert("Ocorreu um erro ao salvar. Tente novamente.");
+      alert(`Ocorreu um erro ao salvar: ${e.message}`);
     }
   };
 
@@ -113,7 +115,7 @@ export function PostForm({ post }: PostFormProps) {
             control={control}
             render={({ field }) => (
               <Editor
-                value={post?.content ? JSON.parse(post.content) : undefined}
+                value={post?.content && typeof post.content === 'string' ? JSON.parse(post.content) : undefined}
                 onChange={(data) => field.onChange(data as any)}
               />
             )}
