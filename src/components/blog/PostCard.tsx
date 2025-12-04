@@ -7,8 +7,6 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Badge } from '../ui/badge';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { getStrapiURL } from '@/lib/utils';
-import { deletePost } from '@/lib/strapi';
 import { useToast } from '../ui/use-toast';
 
 interface PostCardProps {
@@ -28,8 +26,8 @@ export function PostCard({ post, isAdmin = false, onPostDeleted }: PostCardProps
     if (!id) return;
     if (window.confirm(`Tem certeza que deseja deletar o post "${title}"?`)) {
       try {
-        await deletePost(id.toString());
-        toast({ title: 'Post deletado com sucesso!' });
+        // await deletePost(id.toString());
+        toast({ title: 'Função de deletar desabilitada.' });
         if(onPostDeleted) onPostDeleted();
       } catch (error) {
         console.error("Erro ao deletar o post: ", error);
@@ -46,7 +44,7 @@ export function PostCard({ post, isAdmin = false, onPostDeleted }: PostCardProps
   const linkText = isAdmin ? 'Editar' : 'Ler Mais';
   
   const coverImageUrl = coverImage.data 
-    ? getStrapiURL(coverImage.data.attributes.url) 
+    ? coverImage.data.attributes.url
     : (placeholder?.imageUrl || '');
 
   const extractSummary = (content: any) => {

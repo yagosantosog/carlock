@@ -14,9 +14,3 @@ export function slugify(text: string) {
     .replace(/[^\w-]+/g, '')
     .replace(/--+/g, '-');
 }
-
-export function getStrapiURL(path = "") {
-  return `${
-    process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337"
-  }${path}`;
-}

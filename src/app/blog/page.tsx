@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getPosts } from '@/lib/strapi';
 import { StrapiPost } from '@/types/blog';
 import { PostList } from '@/components/blog/PostList';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -15,8 +14,8 @@ export default function BlogPage() {
     const fetchPosts = async () => {
       try {
         setLoading(true);
-        const postsData = await getPosts();
-        setPosts(postsData);
+        // Simulate no posts found
+        setPosts([]);
       } catch (err) {
         setError('Falha ao carregar os posts.');
         console.error(err);

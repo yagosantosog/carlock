@@ -10,7 +10,6 @@ import { Label } from '@/components/ui/label';
 import { slugify } from '@/lib/utils';
 import dynamic from 'next/dynamic';
 import { useToast } from '../ui/use-toast';
-import { createPost, updatePost } from '@/lib/strapi';
 
 const Editor = dynamic(() => import('./Editor').then((mod) => mod.Editor), {
   ssr: false,
@@ -54,33 +53,12 @@ export function PostForm({ post }: PostFormProps) {
 
   const onSubmit = async (data: StrapiPostForm) => {
     try {
-      const formData = new FormData();
-      
-      const postData: any = {
-        title: data.title,
-        slug: data.slug,
-        content: data.content, // Already a string from the editor
-        author: data.author,
-        tags: data.tags.split(',').map(tag => tag.trim()).filter(Boolean),
-      };
-
-      formData.append('data', JSON.stringify(postData));
-
-      if (coverImageFile) {
-        formData.append('files.coverImage', coverImageFile, coverImageFile.name);
-      }
-
-      if (post) {
-        await updatePost(post.id, formData);
-        toast({ title: "Post atualizado com sucesso!" });
-      } else {
-        await createPost(formData);
-        toast({ title: "Post criado com sucesso!" });
-      }
-
-      router.push('/admin/blog');
-      router.refresh();
-
+      // Logic removed as it depended on Strapi
+      toast({
+        variant: "destructive",
+        title: "Funcionalidade desabilitada.",
+        description: 'A criação e edição de posts foi temporariamente desativada.',
+      });
     } catch (e: any) {
       console.error("Error saving post: ", e);
       toast({
@@ -122,7 +100,7 @@ export function PostForm({ post }: PostFormProps) {
       <div>
         <Label htmlFor="coverImage">Imagem de Capa</Label>
         <Input id="coverImage" type="file" onChange={(e) => setCoverImageFile(e.target.files?.[0] || null)} />
-        {post?.attributes.coverImage.data && !coverImageFile && <img src={`${process.env.NEXT_PUBLIC_STRAPI_URL || ''}${post.attributes.coverImage.data.attributes.url}`} alt="Capa atual" className="mt-2 h-32 object-cover" />}
+        {post?.attributes.coverImage.data && !coverImageFile && <img src={post.attributes.coverImage.data.attributes.url} alt="Capa atual" className="mt-2 h-32 object-cover" />}
       </div>
       <div>
         <Label>Conteúdo</Label>

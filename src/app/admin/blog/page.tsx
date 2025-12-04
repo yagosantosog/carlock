@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getPosts } from '@/lib/strapi';
 import { StrapiPost } from '@/types/blog';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -16,8 +15,8 @@ export default function AdminBlogPage() {
   const fetchPosts = async () => {
     try {
       setLoading(true);
-      const postsData = await getPosts();
-      setPosts(postsData);
+      // Simulating no posts found
+      setPosts([]);
     } catch (err) {
       setError('Falha ao carregar os posts.');
       console.error(err);

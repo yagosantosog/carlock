@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getPostBySlug } from '@/lib/strapi';
 import { StrapiPost } from '@/types/blog';
 import Image from 'next/image';
 import { format } from 'date-fns';
@@ -9,7 +8,6 @@ import { ptBR } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { ContentRenderer } from '@/components/blog/ContentRenderer';
-import { getStrapiURL } from '@/lib/utils';
 
 export default function PostPage({ params }: { params: { slug: string } }) {
   const [post, setPost] = useState<StrapiPost | null>(null);
@@ -22,12 +20,8 @@ export default function PostPage({ params }: { params: { slug: string } }) {
     const fetchPost = async () => {
       try {
         setLoading(true);
-        const postData = await getPostBySlug(params.slug);
-        if (postData) {
-          setPost(postData);
-        } else {
-          setError('Post não encontrado.');
-        }
+        // Simulate post not found
+        setError('Post não encontrado.');
       } catch (err) {
         setError('Falha ao carregar o post.');
         console.error(err);
@@ -64,7 +58,7 @@ export default function PostPage({ params }: { params: { slug: string } }) {
     return format(new Date(date), "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
   };
   
-  const coverImageUrl = coverImage.data ? getStrapiURL(coverImage.data.attributes.url) : '';
+  const coverImageUrl = coverImage.data ? coverImage.data.attributes.url : '';
 
   return (
     <article className="container mx-auto py-10 px-4 max-w-4xl">

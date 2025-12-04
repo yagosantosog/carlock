@@ -1,7 +1,6 @@
 'use client';
 
 import { PostForm } from '@/components/blog/PostForm';
-import { getPostById } from '@/lib/strapi';
 import { StrapiPost } from '@/types/blog';
 import { useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -15,12 +14,8 @@ export default function EditPostPage({ params }: { params: { id: string } }) {
     const fetchPost = async () => {
       try {
         setLoading(true);
-        const postData = await getPostById(params.id);
-        if (postData) {
-          setPost(postData);
-        } else {
-          setError('Post não encontrado.');
-        }
+        // Simulate not found
+        setError('Post não encontrado.');
       } catch (err) {
         setError('Falha ao carregar o post.');
         console.error(err);
