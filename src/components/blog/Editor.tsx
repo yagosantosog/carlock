@@ -14,12 +14,13 @@ interface EditorProps {
 
 export const Editor: React.FC<EditorProps> = ({ onChange, value }) => {
   const editorRef = useRef<EditorJS | null>(null);
-  const holderId = `editorjs-${Math.random().toString(36).substring(7)}`;
+  // Use useRef to store the holder ID so it persists across renders
+  const holderIdRef = useRef(`editorjs-${Math.random().toString(36).substring(7)}`);
 
   useEffect(() => {
     if (!editorRef.current) {
       const editor = new EditorJS({
-        holder: holderId,
+        holder: holderIdRef.current,
         tools: {
           header: Header,
           list: List,
@@ -30,8 +31,10 @@ export const Editor: React.FC<EditorProps> = ({ onChange, value }) => {
         },
         data: value,
         async onChange(api) {
-          const data = await api.saver.save();
-          onChange(data);
+           if (editor.isReady) {
+            const data = await api.saver.save();
+            onChange(data);
+          }
         },
         placeholder: 'Comece a escrever sua história...',
       });
@@ -47,5 +50,5 @@ export const Editor: React.FC<EditorProps> = ({ onChange, value }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return <div id={holderId} className="prose dark:prose-invert max-w-full" />;
+  return <div id={holderIdRef.current} className="prose dark:prose-invert max-w-full" />;
 };
