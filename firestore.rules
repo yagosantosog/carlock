@@ -15,6 +15,8 @@ service cloud.firestore {
     match /posts/{postId} {
       allow read: if true;
       allow create, update: if isSignedIn();
+      // Only the author can delete their own post.
+      // Use request.resource.data to access the document data before the delete operation.
       allow delete: if isSignedIn() && isOwner(resource.data.author);
     }
 

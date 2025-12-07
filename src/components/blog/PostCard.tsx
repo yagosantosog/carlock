@@ -50,34 +50,37 @@ export function PostCard({ post, isAdmin = false }: PostCardProps) {
   const placeholder = PlaceHolderImages.find(p => p.id === 'blog-post-placeholder');
 
   const handleDelete = async () => {
-    if (!firestore || !post.id) return;
-    console.log("ID do post para apagar:", post.id);
+    if (!firestore || !post.id) {
+      console.error("Firestore instance or post ID is missing.");
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Não foi possível deletar o post. Tente novamente.",
+      });
+      return;
+    }
 
     if (window.confirm(`Tem certeza que deseja deletar o post "${post.title}"?`)) {
       const postDocRef = doc(firestore, 'posts', post.id);
 
-      if (post.coverImage) {
+      // Delete cover image from Storage if it exists
+      if (post.coverImage && post.coverImage.includes('firebasestorage.googleapis.com')) {
         try {
-          const pathRegex = /o\/(.+?)\?alt=media/;
-          const match = post.coverImage.match(pathRegex);
-          
-          if (match && match[1]) {
-            const filePath = decodeURIComponent(match[1]);
-            const imageRef = ref(storage, filePath);
-            await deleteObject(imageRef);
-          } else {
-             console.warn("Could not extract file path from image URL. The file may not be deleted from Storage.");
-          }
+          // Extract the file path from the full URL
+          const imageRef = ref(storage, post.coverImage);
+          await deleteObject(imageRef);
         } catch (storageError: any) {
-           console.error("Erro ao deletar a imagem de capa: ", storageError);
-           toast({
+          // Log error but don't block post deletion
+          console.error("Erro ao deletar a imagem de capa: ", storageError);
+          toast({
             variant: "destructive",
             title: "Erro ao deletar imagem.",
             description: "Não foi possível deletar a imagem de capa, mas o post será deletado.",
-           });
+          });
         }
       }
 
+      // Delete the post document from Firestore
       deleteDoc(postDocRef)
         .then(() => {
           toast({
@@ -85,11 +88,19 @@ export function PostCard({ post, isAdmin = false }: PostCardProps) {
           });
         })
         .catch((serverError) => {
+          // Create a detailed error for debugging and emit it globally
           const permissionError = new FirestorePermissionError({
             path: postDocRef.path,
             operation: 'delete',
           });
           errorEmitter.emit('permission-error', permissionError);
+          
+          // Show a generic error to the user
+          toast({
+            variant: "destructive",
+            title: "Erro de permissão",
+            description: "Você não tem permissão para deletar este post.",
+          });
         });
     }
   };
