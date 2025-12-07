@@ -32,54 +32,52 @@ export function PostCard({ post, isAdmin = false }: PostCardProps) {
     if (window.confirm(`Tem certeza que deseja deletar o post "${post.title}"?`)) {
       const postDocRef = doc(firestore, 'posts', post.id);
 
-      try {
-        // First, delete the cover image from Storage if it exists
-        if (post.coverImage) {
-          try {
-            // Extract the path from the URL.
-            // Firebase Storage URLs are typically in the format:
-            // https://firebasestorage.googleapis.com/v0/b/your-project-id.appspot.com/o/folder%2FimageName.jpg?alt=media&token=...
-            const pathRegex = /o\/(.+)\?alt=media/;
-            const match = post.coverImage.match(pathRegex);
-            
-            if (match && match[1]) {
-              const filePath = decodeURIComponent(match[1]); // Decode URL-encoded path
-              const imageRef = ref(storage, filePath);
-              await deleteObject(imageRef);
-            } else {
-              console.warn("Could not extract file path from image URL. The file may not be deleted from Storage.");
-            }
-          } catch (storageError) {
-             console.error("Erro ao deletar a imagem de capa: ", storageError);
-             toast({
-              variant: "destructive",
-              title: "Erro ao deletar imagem.",
-              description: "Não foi possível deletar a imagem de capa do post, mas o post será deletado.",
-             });
+      // First, delete the cover image from Storage if it exists
+      if (post.coverImage) {
+        try {
+          // Firebase Storage URLs are typically in the format:
+          // https://firebasestorage.googleapis.com/v0/b/your-project-id.appspot.com/o/folder%2FimageName.jpg?alt=media&token=...
+          // We need to extract the path: "folder/imageName.jpg"
+          const pathRegex = /o\/(.+?)\?alt=media/;
+          const match = post.coverImage.match(pathRegex);
+          
+          if (match && match[1]) {
+            const filePath = decodeURIComponent(match[1]); // Decode URL-encoded path
+            const imageRef = ref(storage, filePath);
+            await deleteObject(imageRef);
+          } else {
+             console.warn("Could not extract file path from image URL. The file may not be deleted from Storage.");
           }
+        } catch (storageError: any) {
+           // Don't block post deletion if image deletion fails, but log it.
+           console.error("Erro ao deletar a imagem de capa: ", storageError);
+           toast({
+            variant: "destructive",
+            title: "Erro ao deletar imagem.",
+            description: "Não foi possível deletar a imagem de capa, mas o post será deletado.",
+           });
         }
-
-        // Then, delete the post document from Firestore
-        await deleteDoc(postDocRef);
-
-        toast({
-          title: "Post deletado com sucesso!",
-        });
-
-      } catch (serverError: any) {
-        // If Firestore deletion fails, emit a permission error
-        const permissionError = new FirestorePermissionError({
-          path: postDocRef.path,
-          operation: 'delete',
-        });
-        errorEmitter.emit('permission-error', permissionError);
-        // You might want to show a toast here as well for Firestore errors
-        toast({
-          variant: "destructive",
-          title: "Erro ao deletar o post.",
-          description: "Você não tem permissão para deletar este post.",
-        });
       }
+
+      // Then, delete the post document from Firestore
+      deleteDoc(postDocRef)
+        .then(() => {
+          toast({
+            title: "Post deletado com sucesso!",
+          });
+        })
+        .catch((serverError) => {
+          const permissionError = new FirestorePermissionError({
+            path: postDocRef.path,
+            operation: 'delete',
+          });
+          errorEmitter.emit('permission-error', permissionError);
+          toast({
+            variant: "destructive",
+            title: "Erro ao deletar o post.",
+            description: "Você não tem permissão para deletar este post.",
+          });
+        });
     }
   };
   
