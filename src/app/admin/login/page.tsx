@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { signInWithEmailAndPassword } from 'firebase/auth';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,21 +15,46 @@ const sdks = initializeFirebase();
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const auth = sdks.auth;
+  const db = sdks.firestore;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
     try {
-      await signInWithEmailAndPassword(sdks.auth, email, password);
+      // 1. Find user by username in Firestore
+      const usersRef = collection(db, 'users');
+      const q = query(usersRef, where('username', '==', username));
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        throw new Error('Usuário não encontrado.');
+      }
+
+      // 2. Get user's email
+      const userDoc = querySnapshot.docs[0];
+      const userData = userDoc.data();
+      const email = userData.email;
+
+      if (!email) {
+          throw new Error('Conta de usuário corrompida. O email não foi encontrado.');
+      }
+
+      // 3. Sign in with email and password
+      await signInWithEmailAndPassword(auth, email, password);
       router.push('/admin/blog');
     } catch (err: any) {
       console.error('login error', err);
-      setError(err?.message || 'Ocorreu um erro ao tentar fazer login.');
+      if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+        setError('Senha incorreta.');
+      } else {
+        setError(err?.message || 'Ocorreu um erro ao tentar fazer login.');
+      }
     } finally {
       setLoading(false);
     }
@@ -44,8 +70,8 @@ export default function LoginPage() {
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" value={email} onChange={e => setEmail(e.target.value)} type="email" required />
+              <Label htmlFor="username">Nome de usuário</Label>
+              <Input id="username" value={username} onChange={e => setUsername(e.target.value)} required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Senha</Label>

@@ -42,7 +42,11 @@ export default function RegisterPage() {
       router.push('/admin/blog');
     } catch (err: any) {
       console.error('register error', err);
-      setError(err?.message || 'Ocorreu um erro ao criar a conta.');
+      if (err.code === 'auth/email-already-in-use') {
+        setError('Este e-mail já está em uso.');
+      } else {
+        setError(err?.message || 'Ocorreu um erro ao criar a conta.');
+      }
     } finally {
       setLoading(false);
     }
