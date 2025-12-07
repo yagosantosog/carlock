@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import Image from "next/image";
 import { Facebook, Instagram, Phone } from "lucide-react";
@@ -21,6 +22,7 @@ const menuItems: MenuItem[] = [
         { text: "Sobre", url: "#about" },
         { text: "Diferenciais", url: "#differentials" },
         { text: "Serviços", url: "#features" },
+        { text: "Blog", url: "/blog" },
       ],
     },
     {

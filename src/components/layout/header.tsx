@@ -29,6 +29,7 @@ export function Header() {
     { href: "#about", label: "Sobre" },
     { href: "#differentials", label: "Diferenciais" },
     { href: "#services", label: "Soluções" },
+    { href: "/blog", label: "Blog" },
   ];
 
   return (
@@ -55,6 +56,7 @@ export function Header() {
           <Link href="#about" className={cn( buttonVariants({ variant: "ghost" }), isScrolled ? "text-foreground/60 hover:text-foreground/80" : "text-white/80 hover:text-white" )}>Sobre</Link>
           <Link href="#differentials" className={cn( buttonVariants({ variant: "ghost" }), isScrolled ? "text-foreground/60 hover:text-foreground/80" : "text-white/80 hover:text-white" )}>Diferenciais</Link>
           <Link href="#services" className={cn( buttonVariants({ variant: "ghost" }), isScrolled ? "text-foreground/60 hover:text-foreground/80" : "text-white/80 hover:text-white" )}>Soluções</Link>
+          <Link href="/blog" className={cn( buttonVariants({ variant: "ghost" }), isScrolled ? "text-foreground/60 hover:text-foreground/80" : "text-white/80 hover:text-white" )}>Blog</Link>
           <Button asChild size="lg" className="transition-transform duration-300 hover:scale-105 active:scale-95 ml-4">
             <Link href="https://api.whatsapp.com/send?phone=5516993166262" target="_blank">Fale Conosco</Link>
           </Button>
