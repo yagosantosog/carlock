@@ -12,9 +12,9 @@ export default function EditPostPage({ params }: { params: { id: string } }) {
   const firestore = useFirestore();
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
-  const { id } = params;
 
   useEffect(() => {
+    const { id } = params;
     if (!firestore || !id) return;
 
     const fetchPost = async () => {
@@ -27,7 +27,7 @@ export default function EditPostPage({ params }: { params: { id: string } }) {
     };
 
     fetchPost();
-  }, [firestore, id]);
+  }, [firestore, params]);
 
   if (loading) {
     return (
