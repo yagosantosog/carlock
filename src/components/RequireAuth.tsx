@@ -11,7 +11,7 @@ export function RequireAuth({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/login');
+      router.push('/admin/login');
     }
   }, [loading, user, router]);
 
