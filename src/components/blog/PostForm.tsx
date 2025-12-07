@@ -8,12 +8,11 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useUser, useFirestore } from '@/firebase';
-import { collection, addDoc, doc, updateDoc, getDoc } from 'firebase/firestore';
+import { collection, addDoc, doc, updateDoc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { slugify } from '@/lib/utils';
 import dynamic from 'next/dynamic';
 import { useToast } from '../ui/use-toast';
-import { UserProfile } from '@/types/user';
 
 const Editor = dynamic(() => import('./Editor').then((mod) => mod.Editor), {
   ssr: false,
@@ -92,10 +91,12 @@ export function PostForm({ post }: PostFormProps) {
         await updateDoc(postRef, postData);
       } else {
         const collectionRef = collection(firestore, 'posts');
-        await addDoc(collectionRef, {
+        const docRef = await addDoc(collectionRef, {
           ...postData,
           createdAt: nowIso,
         });
+        // Now, update the new document with its own ID
+        await updateDoc(docRef, { id: docRef.id });
       }
 
       toast({
