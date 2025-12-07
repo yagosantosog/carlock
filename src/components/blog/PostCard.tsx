@@ -1,3 +1,4 @@
+'use client';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Post } from '@/types/blog';
@@ -10,6 +11,9 @@ import { deleteDoc, doc } from 'firebase/firestore';
 import { useFirestore } from '@/firebase';
 import { getStorage, ref, deleteObject } from 'firebase/storage';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
+import { useToast } from '../ui/use-toast';
 
 interface PostCardProps {
   post: Post;
@@ -19,21 +23,38 @@ interface PostCardProps {
 export function PostCard({ post, isAdmin = false }: PostCardProps) {
   const firestore = useFirestore();
   const storage = getStorage();
+  const { toast } = useToast();
   const placeholder = PlaceHolderImages.find(p => p.id === 'blog-post-placeholder');
 
   const handleDelete = async () => {
     if (!firestore || !post.id) return;
     if (window.confirm(`Tem certeza que deseja deletar o post "${post.title}"?`)) {
-      try {
-        await deleteDoc(doc(firestore, 'posts', post.id));
-        if (post.coverImage) {
-          const imageRef = ref(storage, post.coverImage);
-          await deleteObject(imageRef);
-        }
-      } catch (error) {
-        console.error("Erro ao deletar o post: ", error);
-        alert("Ocorreu um erro ao deletar o post.");
-      }
+      const postDocRef = doc(firestore, 'posts', post.id);
+      
+      deleteDoc(postDocRef)
+        .then(() => {
+          if (post.coverImage) {
+            const imageRef = ref(storage, post.coverImage);
+            deleteObject(imageRef).catch((error) => {
+               console.error("Erro ao deletar a imagem de capa: ", error);
+               toast({
+                variant: "destructive",
+                title: "Erro ao deletar imagem.",
+                description: "Não foi possível deletar a imagem de capa do post.",
+               });
+            });
+          }
+           toast({
+            title: "Post deletado com sucesso!",
+          });
+        })
+        .catch((serverError) => {
+          const permissionError = new FirestorePermissionError({
+            path: postDocRef.path,
+            operation: 'delete',
+          });
+          errorEmitter.emit('permission-error', permissionError);
+        });
     }
   };
   
