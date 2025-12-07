@@ -41,7 +41,6 @@ export default function RegisterPage() {
 
       router.push('/admin/blog');
     } catch (err: any) {
-      console.error('register error', err);
       if (err.code === 'auth/email-already-in-use') {
         setError('Este e-mail já está em uso.');
       } else {
