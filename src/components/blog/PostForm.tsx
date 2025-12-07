@@ -8,11 +8,12 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useUser, useFirestore } from '@/firebase';
-import { collection, addDoc, doc, updateDoc } from 'firebase/firestore';
+import { collection, addDoc, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { slugify } from '@/lib/utils';
 import dynamic from 'next/dynamic';
 import { useToast } from '../ui/use-toast';
+import { UserProfile } from '@/types/user';
 
 const Editor = dynamic(() => import('./Editor').then((mod) => mod.Editor), {
   ssr: false,
@@ -44,10 +45,20 @@ export function PostForm({ post }: PostFormProps) {
   }, [title, setValue, post]);
 
   useEffect(() => {
-    if (user && !post?.author) {
-      setValue('author', user.displayName || user.email || 'Autor Desconhecido');
-    }
-  }, [user, post, setValue]);
+    const fetchAndSetAuthor = async () => {
+      if (user && !post?.author && firestore) {
+        const userDocRef = doc(firestore, 'users', user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        if (userDocSnap.exists()) {
+          const userProfile = userDocSnap.data() as UserProfile;
+          setValue('author', userProfile.username);
+        } else {
+          setValue('author', user.displayName || user.email || 'Autor Desconhecido');
+        }
+      }
+    };
+    fetchAndSetAuthor();
+  }, [user, post, setValue, firestore]);
   
   const onSubmit = async (data: Post) => {
     if (!firestore || !user) {
@@ -78,11 +89,23 @@ export function PostForm({ post }: PostFormProps) {
 
       const nowIso = new Date().toISOString();
 
+      let author = data.author;
+      if (!author) {
+        const userDocRef = doc(firestore, 'users', user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        if (userDocSnap.exists()) {
+          const userProfile = userDocSnap.data() as UserProfile;
+          author = userProfile.username;
+        } else {
+          author = user.displayName || user.email || 'Autor Desconhecido';
+        }
+      }
+
       const postData: any = {
         title: String(data.title || ''),
         slug: String(data.slug || ''),
         content: contentString,
-        author: String(data.author || user.displayName || user.email),
+        author: String(author),
         tags: normalizedTags,
         updatedAt: nowIso,
       };
