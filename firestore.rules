@@ -7,16 +7,21 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
     // Rules for posts collection
     match /posts/{postId} {
       allow read: if true;
-      allow create, update, delete: if isSignedIn();
+      allow create, update: if isSignedIn();
+      allow delete: if isSignedIn() && isOwner(resource.data.author);
     }
 
     // Rules for users collection
     match /users/{userId} {
       allow read: if true;
-      allow write: if isSignedIn() && request.auth.uid == userId;
+      allow write: if isSignedIn() && isOwner(userId);
     }
   }
 }

@@ -1,15 +1,36 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { useFirestore } from '@/firebase';
 import { Post } from '@/types/blog';
+import { UserProfile } from '@/types/user';
 import Image from 'next/image';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { ContentRenderer } from '@/components/blog/ContentRenderer';
+
+function AuthorDisplay({ authorId }: { authorId: string }) {
+  const firestore = useFirestore();
+  const [author, setAuthor] = useState<UserProfile | null>(null);
+
+  useEffect(() => {
+    if (!firestore || !authorId) return;
+    const fetchAuthor = async () => {
+      const userRef = doc(firestore, 'users', authorId);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        setAuthor(userSnap.data() as UserProfile);
+      }
+    };
+    fetchAuthor();
+  }, [firestore, authorId]);
+
+  return <>{author ? author.username : 'Carregando...'}</>;
+}
+
 
 export default function PostPage({ params }: { params: { slug: string } }) {
   const firestore = useFirestore();
@@ -61,7 +82,7 @@ export default function PostPage({ params }: { params: { slug: string } }) {
       <header className="mb-8">
         <h1 className="text-4xl md:text-5xl font-extrabold leading-tight mb-4">{post.title}</h1>
         <p className="text-muted-foreground">
-          Por {post.author} em {post.createdAt && formatDate(post.createdAt as string)}
+          Por <AuthorDisplay authorId={post.author as string} /> em {post.createdAt && formatDate(post.createdAt as string)}
         </p>
       </header>
       {post.coverImage && (

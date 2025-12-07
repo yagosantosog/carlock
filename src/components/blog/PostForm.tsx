@@ -76,7 +76,7 @@ export function PostForm({ post }: PostFormProps) {
         title: String(data.title || ''),
         slug: String(data.slug || ''),
         content: contentString,
-        author: String(data.author || ''),
+        author: user.uid, // Salva o UID do usuário logado
         tags: normalizedTags,
         updatedAt: nowIso,
       };
@@ -122,11 +122,6 @@ export function PostForm({ post }: PostFormProps) {
         <Label htmlFor="title">Título</Label>
         <Input id="title" {...register('title', { required: 'Título é obrigatório' })} />
         {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
-      </div>
-       <div>
-        <Label htmlFor="author">Autor</Label>
-        <Input id="author" {...register('author', { required: 'Autor é obrigatório' })} />
-        {errors.author && <p className="text-red-500 text-sm mt-1">{errors.author.message}</p>}
       </div>
       <div>
         <Label htmlFor="slug">Slug</Label>

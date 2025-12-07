@@ -7,49 +7,68 @@ import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Badge } from '../ui/badge';
-import { deleteDoc, doc } from 'firebase/firestore';
-import { useFirestore } from '@/firebase';
+import { deleteDoc, doc, getDoc } from 'firebase/firestore';
+import { useFirestore, useUser } from '@/firebase';
 import { getStorage, ref, deleteObject } from 'firebase/storage';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 import { useToast } from '../ui/use-toast';
+import { useEffect, useState } from 'react';
+import { UserProfile } from '@/types/user';
 
 interface PostCardProps {
   post: Post;
   isAdmin?: boolean;
 }
 
+function AuthorDisplay({ authorId }: { authorId: string }) {
+  const firestore = useFirestore();
+  const [author, setAuthor] = useState<UserProfile | null>(null);
+
+  useEffect(() => {
+    if (!firestore || !authorId) return;
+    const fetchAuthor = async () => {
+      const userRef = doc(firestore, 'users', authorId);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        setAuthor(userSnap.data() as UserProfile);
+      }
+    };
+    fetchAuthor();
+  }, [firestore, authorId]);
+
+  return <>{author ? author.username : 'Carregando...'}</>;
+}
+
+
 export function PostCard({ post, isAdmin = false }: PostCardProps) {
   const firestore = useFirestore();
+  const { user } = useUser();
   const storage = getStorage();
   const { toast } = useToast();
   const placeholder = PlaceHolderImages.find(p => p.id === 'blog-post-placeholder');
 
   const handleDelete = async () => {
     if (!firestore || !post.id) return;
+    console.log("ID do post para apagar:", post.id);
 
     if (window.confirm(`Tem certeza que deseja deletar o post "${post.title}"?`)) {
       const postDocRef = doc(firestore, 'posts', post.id);
 
-      // First, delete the cover image from Storage if it exists
       if (post.coverImage) {
         try {
-          // Firebase Storage URLs are typically in the format:
-          // https://firebasestorage.googleapis.com/v0/b/your-project-id.appspot.com/o/folder%2FimageName.jpg?alt=media&token=...
-          // We need to extract the path: "folder/imageName.jpg"
           const pathRegex = /o\/(.+?)\?alt=media/;
           const match = post.coverImage.match(pathRegex);
           
           if (match && match[1]) {
-            const filePath = decodeURIComponent(match[1]); // Decode URL-encoded path
+            const filePath = decodeURIComponent(match[1]);
             const imageRef = ref(storage, filePath);
             await deleteObject(imageRef);
           } else {
              console.warn("Could not extract file path from image URL. The file may not be deleted from Storage.");
           }
         } catch (storageError: any) {
-           // Don't block post deletion if image deletion fails, but log it.
            console.error("Erro ao deletar a imagem de capa: ", storageError);
            toast({
             variant: "destructive",
@@ -59,7 +78,6 @@ export function PostCard({ post, isAdmin = false }: PostCardProps) {
         }
       }
 
-      // Then, delete the post document from Firestore
       deleteDoc(postDocRef)
         .then(() => {
           toast({
@@ -72,11 +90,6 @@ export function PostCard({ post, isAdmin = false }: PostCardProps) {
             operation: 'delete',
           });
           errorEmitter.emit('permission-error', permissionError);
-          toast({
-            variant: "destructive",
-            title: "Erro ao deletar o post.",
-            description: "Você não tem permissão para deletar este post.",
-          });
         });
     }
   };
@@ -116,7 +129,7 @@ export function PostCard({ post, isAdmin = false }: PostCardProps) {
       </CardHeader>
       <CardContent className="flex-grow">
         <p className="text-muted-foreground text-sm mb-4">
-          {post.createdAt && format(new Date(post.createdAt as string), "dd 'de' MMMM, yyyy", { locale: ptBR })} por {post.author}
+          {post.createdAt && format(new Date(post.createdAt as string), "dd 'de' MMMM, yyyy", { locale: ptBR })} por <AuthorDisplay authorId={post.author as string} />
         </p>
         {!isAdmin && <p className="text-sm text-muted-foreground">{extractSummary(post.content)}</p>}
          {post.tags && (
@@ -132,7 +145,7 @@ export function PostCard({ post, isAdmin = false }: PostCardProps) {
             <Button asChild variant="default">
                 <Link href={postUrl}>{linkText}</Link>
             </Button>
-            {isAdmin && (
+            {isAdmin && user?.uid === post.author && (
                 <Button variant="destructive" onClick={handleDelete}>
                 Deletar
                 </Button>
