@@ -12,12 +12,13 @@ export default function EditPostPage({ params }: { params: { id: string } }) {
   const firestore = useFirestore();
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
+  const { id } = params;
 
   useEffect(() => {
-    if (!firestore || !params.id) return;
+    if (!firestore || !id) return;
 
     const fetchPost = async () => {
-      const docRef = doc(firestore, 'posts', params.id);
+      const docRef = doc(firestore, 'posts', id);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         setPost({ id: docSnap.id, ...docSnap.data() } as Post);
@@ -26,7 +27,7 @@ export default function EditPostPage({ params }: { params: { id: string } }) {
     };
 
     fetchPost();
-  }, [firestore, params.id]);
+  }, [firestore, id]);
 
   if (loading) {
     return (
