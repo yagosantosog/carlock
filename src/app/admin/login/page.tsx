@@ -49,7 +49,6 @@ export default function LoginPage() {
       await signInWithEmailAndPassword(auth, email, password);
       router.push('/admin/blog');
     } catch (err: any) {
-      console.error('login error', err);
       if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
         setError('Senha incorreta.');
       } else {
