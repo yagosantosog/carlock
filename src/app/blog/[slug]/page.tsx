@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, use } from 'react';
 import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { useFirestore } from '@/firebase';
 import { Post } from '@/types/blog';
@@ -32,16 +33,17 @@ function AuthorDisplay({ authorId }: { authorId: string }) {
 }
 
 
-export default function PostPage({ params }: { params: { slug: string } }) {
+export default function PostPage({ params }: { params: Promise<{ slug: string }> }) {
   const firestore = useFirestore();
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
+  const { slug } = use(params);
 
   useEffect(() => {
     if (!firestore) return;
 
     const fetchPost = async () => {
-      const q = query(collection(firestore, 'posts'), where('slug', '==', params.slug));
+      const q = query(collection(firestore, 'posts'), where('slug', '==', slug));
       const querySnapshot = await getDocs(q);
       if (!querySnapshot.empty) {
         const doc = querySnapshot.docs[0];
@@ -51,7 +53,7 @@ export default function PostPage({ params }: { params: { slug: string } }) {
     };
 
     fetchPost();
-  }, [firestore, params.slug]);
+  }, [firestore, slug]);
 
   if (loading) {
     return (
