@@ -10,7 +10,7 @@ service cloud.firestore {
     // Rules for posts collection
     match /posts/{postId} {
       allow read: if true;
-      allow write: if isSignedIn();
+      allow create, update, delete: if isSignedIn();
     }
 
     // Rules for users collection
