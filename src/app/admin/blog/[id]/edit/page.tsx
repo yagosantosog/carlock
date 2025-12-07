@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, use } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { useFirestore } from '@/firebase';
 import { PostForm } from '@/components/blog/PostForm';
@@ -8,13 +8,15 @@ import { Post } from '@/types/blog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { RequireAuth } from '@/components/RequireAuth';
 
-export default function EditPostPage({ params }: { params: { id: string } }) {
+export default function EditPostPage({ params }: { params: Promise<{ id: string }> }) {
   const firestore = useFirestore();
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
+  
+  // Desembrulha a promessa de params com React.use()
+  const { id } = use(params);
 
   useEffect(() => {
-    const { id } = params;
     if (!firestore || !id) return;
 
     const fetchPost = async () => {
@@ -27,7 +29,7 @@ export default function EditPostPage({ params }: { params: { id: string } }) {
     };
 
     fetchPost();
-  }, [firestore, params]);
+  }, [firestore, id]);
 
   if (loading) {
     return (
