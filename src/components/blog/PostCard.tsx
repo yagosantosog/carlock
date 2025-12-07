@@ -49,13 +49,13 @@ export function PostCard({ post, isAdmin = false }: PostCardProps) {
   const { toast } = useToast();
   const placeholder = PlaceHolderImages.find(p => p.id === 'blog-post-placeholder');
 
-  const handleDelete = async () => {
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.preventDefault(); // Impede a navegação ao clicar no botão de deletar
     if (!firestore || !post.id) {
-      console.error("Firestore instance or post ID is missing.");
       toast({
         variant: "destructive",
         title: "Erro",
-        description: "Não foi possível deletar o post. Tente novamente.",
+        description: "Não foi possível deletar o post. Instância do Firestore ou ID do post ausente.",
       });
       return;
     }
@@ -66,21 +66,20 @@ export function PostCard({ post, isAdmin = false }: PostCardProps) {
       // Delete cover image from Storage if it exists
       if (post.coverImage && post.coverImage.includes('firebasestorage.googleapis.com')) {
         try {
-          // Extract the file path from the full URL
           const imageRef = ref(storage, post.coverImage);
           await deleteObject(imageRef);
         } catch (storageError: any) {
-          // Log error but don't block post deletion
-          console.error("Erro ao deletar a imagem de capa: ", storageError);
-          toast({
-            variant: "destructive",
-            title: "Erro ao deletar imagem.",
-            description: "Não foi possível deletar a imagem de capa, mas o post será deletado.",
-          });
+           if (storageError.code !== 'storage/object-not-found') {
+              console.error("Erro ao deletar a imagem de capa: ", storageError);
+              toast({
+                variant: "destructive",
+                title: "Erro ao deletar imagem.",
+                description: "Não foi possível deletar a imagem de capa, mas a exclusão do post continuará.",
+              });
+           }
         }
       }
 
-      // Delete the post document from Firestore
       deleteDoc(postDocRef)
         .then(() => {
           toast({
@@ -88,14 +87,11 @@ export function PostCard({ post, isAdmin = false }: PostCardProps) {
           });
         })
         .catch((serverError) => {
-          // Create a detailed error for debugging and emit it globally
           const permissionError = new FirestorePermissionError({
             path: postDocRef.path,
             operation: 'delete',
           });
           errorEmitter.emit('permission-error', permissionError);
-          
-          // Show a generic error to the user
           toast({
             variant: "destructive",
             title: "Erro de permissão",
@@ -106,13 +102,15 @@ export function PostCard({ post, isAdmin = false }: PostCardProps) {
   };
   
   const postUrl = isAdmin ? `/admin/blog/${post.id}/edit` : `/blog/${post.slug}`;
-  const linkText = isAdmin ? 'Editar' : 'Ler Mais';
 
   const extractSummary = (content: any) => {
     try {
-      const data = JSON.parse(content);
-      const firstParagraph = data.blocks.find((block: any) => block.type === 'paragraph');
-      return firstParagraph?.data.text.substring(0, 150) + '...' || '';
+      if (typeof content === 'string') {
+        const data = JSON.parse(content);
+        const firstParagraph = data.blocks.find((block: any) => block.type === 'paragraph');
+        return firstParagraph?.data.text.substring(0, 150) + '...' || '';
+      }
+      return '';
     } catch (e) {
       return '';
     }
@@ -120,7 +118,7 @@ export function PostCard({ post, isAdmin = false }: PostCardProps) {
 
   return (
     <Card className="flex flex-col h-full overflow-hidden transition-shadow duration-300 hover:shadow-lg">
-      <Link href={postUrl}>
+       <Link href={postUrl} className="flex flex-col h-full">
         <div className="relative w-full h-48">
           <Image
             src={post.coverImage || placeholder?.imageUrl || ''}
@@ -130,39 +128,43 @@ export function PostCard({ post, isAdmin = false }: PostCardProps) {
             className="transition-transform duration-300 group-hover:scale-105"
           />
         </div>
-      </Link>
-      <CardHeader>
-        <CardTitle className="text-xl font-bold leading-snug">
-          <Link href={postUrl} className="hover:text-primary transition-colors">
+        <CardHeader>
+          <CardTitle className="text-xl font-bold leading-snug">
             {post.title}
-          </Link>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="flex-grow">
-        <p className="text-muted-foreground text-sm mb-4">
-          {post.createdAt && format(new Date(post.createdAt as string), "dd 'de' MMMM, yyyy", { locale: ptBR })} por <AuthorDisplay authorId={post.author as string} />
-        </p>
-        {!isAdmin && <p className="text-sm text-muted-foreground">{extractSummary(post.content)}</p>}
-         {post.tags && (
-          <div className="mt-4 flex flex-wrap gap-2">
-            {post.tags.map((tag) => (
-              <Badge key={tag} variant="secondary">{tag}</Badge>
-            ))}
-          </div>
-        )}
-      </CardContent>
-      <CardFooter className="mt-auto">
-        <div className="flex justify-between w-full">
-            <Button asChild variant="default">
-                <Link href={postUrl}>{linkText}</Link>
-            </Button>
-            {isAdmin && user?.uid === post.author && (
-                <Button variant="destructive" onClick={handleDelete}>
-                Deletar
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex-grow">
+          <p className="text-muted-foreground text-sm mb-4">
+            {post.createdAt && format(new Date(post.createdAt as string), "dd 'de' MMMM, yyyy", { locale: ptBR })} por <AuthorDisplay authorId={post.author as string} />
+          </p>
+          {!isAdmin && <p className="text-sm text-muted-foreground">{extractSummary(post.content)}</p>}
+          {post.tags && Array.isArray(post.tags) && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {post.tags.map((tag) => (
+                <Badge key={tag} variant="secondary">{tag}</Badge>
+              ))}
+            </div>
+          )}
+        </CardContent>
+        <CardFooter className="mt-auto">
+          {isAdmin ? (
+             <div className="flex justify-between w-full">
+                <Button asChild variant="default">
+                    <Link href={postUrl}>Editar</Link>
                 </Button>
-            )}
-        </div>
-      </CardFooter>
+                {user?.uid === post.author && (
+                    <Button variant="destructive" onClick={handleDelete}>
+                    Deletar
+                    </Button>
+                )}
+            </div>
+          ) : (
+             <Button asChild variant="default">
+                <p>Ler Mais</p>
+            </Button>
+          )}
+        </CardFooter>
+      </Link>
     </Card>
   );
 }

@@ -56,9 +56,9 @@ export default function PostPage({ params }: { params: { slug: string } }) {
   if (loading) {
     return (
       <div className="container mx-auto py-10 px-4 max-w-4xl">
+        <Skeleton className="h-[400px] w-full rounded-xl mb-8" />
         <Skeleton className="h-8 w-3/4 mb-4" />
         <Skeleton className="h-4 w-1/4 mb-8" />
-        <Skeleton className="h-[400px] w-full rounded-xl mb-8" />
         <div className="space-y-4">
           <Skeleton className="h-6 w-full" />
           <Skeleton className="h-6 w-5/6" />
@@ -79,21 +79,21 @@ export default function PostPage({ params }: { params: { slug: string } }) {
 
   return (
     <article className="container mx-auto py-10 px-4 max-w-4xl">
+      {post.coverImage && (
+        <div className="relative w-full h-96 mb-8 rounded-lg overflow-hidden">
+          <Image src={post.coverImage} alt={post.title} layout="fill" objectFit="cover" />
+        </div>
+      )}
       <header className="mb-8">
         <h1 className="text-4xl md:text-5xl font-extrabold leading-tight mb-4">{post.title}</h1>
         <p className="text-muted-foreground">
           Por <AuthorDisplay authorId={post.author as string} /> em {post.createdAt && formatDate(post.createdAt as string)}
         </p>
       </header>
-      {post.coverImage && (
-        <div className="relative w-full h-96 mb-8 rounded-lg overflow-hidden">
-          <Image src={post.coverImage} alt={post.title} layout="fill" objectFit="cover" />
-        </div>
-      )}
       <div className="prose prose-lg dark:prose-invert max-w-none mx-auto">
         <ContentRenderer data={post.content} />
       </div>
-      {post.tags && post.tags.length > 0 && (
+      {post.tags && Array.isArray(post.tags) && post.tags.length > 0 && (
         <div className="mt-8">
           {post.tags.map((tag) => (
             <Badge key={tag} variant="secondary" className="mr-2 mb-2">

@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useUser, useFirestore } from '@/firebase';
-import { collection, addDoc, doc, updateDoc } from 'firebase/firestore';
+import { collection, addDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { slugify } from '@/lib/utils';
 import dynamic from 'next/dynamic';
@@ -31,8 +31,12 @@ export function PostForm({ post }: PostFormProps) {
   const { toast } = useToast();
 
   const { register, handleSubmit, setValue, watch, control, formState: { errors, isSubmitting } } = useForm<Post>({
-    defaultValues: post || { tags: [] }
+    defaultValues: post ? {
+      ...post,
+      tags: Array.isArray(post.tags) ? post.tags : (post.tags || '').split(',').map(s => s.trim())
+    } : { tags: [] }
   });
+  
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
 
   const title = watch('title');
@@ -70,32 +74,27 @@ export function PostForm({ post }: PostFormProps) {
         ? JSON.stringify(data.content)
         : String(data.content || '');
 
-      const nowIso = new Date().toISOString();
-      
       const postData: any = {
+        ...data,
         title: String(data.title || ''),
         slug: String(data.slug || ''),
         content: contentString,
-        author: user.uid, // Salva o UID do usuário logado
+        author: user.uid,
         tags: normalizedTags,
-        updatedAt: nowIso,
+        updatedAt: new Date().toISOString(),
       };
 
       if (coverImageUrl) {
         postData.coverImage = coverImageUrl;
       }
 
-
       if (post && post.id) {
         const postRef = doc(firestore, 'posts', post.id);
         await updateDoc(postRef, postData);
       } else {
         const collectionRef = collection(firestore, 'posts');
-        const docRef = await addDoc(collectionRef, {
-          ...postData,
-          createdAt: nowIso,
-        });
-        // Now, update the new document with its own ID
+        postData.createdAt = new Date().toISOString();
+        const docRef = await addDoc(collectionRef, postData);
         await updateDoc(docRef, { id: docRef.id });
       }
 
