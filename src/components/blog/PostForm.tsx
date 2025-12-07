@@ -44,22 +44,6 @@ export function PostForm({ post }: PostFormProps) {
     }
   }, [title, setValue, post]);
 
-  useEffect(() => {
-    const fetchAndSetAuthor = async () => {
-      if (user && !post?.author && firestore) {
-        const userDocRef = doc(firestore, 'users', user.uid);
-        const userDocSnap = await getDoc(userDocRef);
-        if (userDocSnap.exists()) {
-          const userProfile = userDocSnap.data() as UserProfile;
-          setValue('author', userProfile.username);
-        } else {
-          setValue('author', user.displayName || user.email || 'Autor Desconhecido');
-        }
-      }
-    };
-    fetchAndSetAuthor();
-  }, [user, post, setValue, firestore]);
-  
   const onSubmit = async (data: Post) => {
     if (!firestore || !user) {
       toast({
@@ -88,24 +72,12 @@ export function PostForm({ post }: PostFormProps) {
         : String(data.content || '');
 
       const nowIso = new Date().toISOString();
-
-      let author = data.author;
-      if (!author) {
-        const userDocRef = doc(firestore, 'users', user.uid);
-        const userDocSnap = await getDoc(userDocRef);
-        if (userDocSnap.exists()) {
-          const userProfile = userDocSnap.data() as UserProfile;
-          author = userProfile.username;
-        } else {
-          author = user.displayName || user.email || 'Autor Desconhecido';
-        }
-      }
-
+      
       const postData: any = {
         title: String(data.title || ''),
         slug: String(data.slug || ''),
         content: contentString,
-        author: String(author),
+        author: String(data.author || ''),
         tags: normalizedTags,
         updatedAt: nowIso,
       };
@@ -149,6 +121,11 @@ export function PostForm({ post }: PostFormProps) {
         <Label htmlFor="title">Título</Label>
         <Input id="title" {...register('title', { required: 'Título é obrigatório' })} />
         {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
+      </div>
+       <div>
+        <Label htmlFor="author">Autor</Label>
+        <Input id="author" {...register('author', { required: 'Autor é obrigatório' })} />
+        {errors.author && <p className="text-red-500 text-sm mt-1">{errors.author.message}</p>}
       </div>
       <div>
         <Label htmlFor="slug">Slug</Label>
