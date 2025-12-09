@@ -9,8 +9,8 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Badge } from '../ui/badge';
 import { deleteDoc, doc, getDoc } from 'firebase/firestore';
-import { useFirestore, useUser } from '@/firebase';
-import { getStorage, ref, deleteObject } from 'firebase/storage';
+import { useFirestore, useUser, useStorage } from '@/firebase';
+import { ref, deleteObject } from 'firebase/storage';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
@@ -45,8 +45,8 @@ function AuthorDisplay({ authorId }: { authorId: string }) {
 
 export function PostCard({ post, isAdmin = false }: PostCardProps) {
   const firestore = useFirestore();
+  const storage = useStorage();
   const { user } = useUser();
-  const storage = getStorage();
   const { toast } = useToast();
   const placeholder = PlaceHolderImages.find(p => p.id === 'blog-post-placeholder');
 

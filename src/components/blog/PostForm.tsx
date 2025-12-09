@@ -7,9 +7,9 @@ import { Post } from '@/types/blog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { useUser, useFirestore } from '@/firebase';
-import { collection, addDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { useUser, useFirestore, useStorage } from '@/firebase';
+import { collection, addDoc, doc, updateDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { slugify } from '@/lib/utils';
 import dynamic from 'next/dynamic';
 import { useToast } from '../ui/use-toast';
@@ -26,8 +26,8 @@ interface PostFormProps {
 export function PostForm({ post }: PostFormProps) {
   const router = useRouter();
   const firestore = useFirestore();
+  const storage = useStorage();
   const { user } = useUser();
-  const storage = getStorage();
   const { toast } = useToast();
 
   const { register, handleSubmit, setValue, watch, control, formState: { errors, isSubmitting } } = useForm<Post>({
