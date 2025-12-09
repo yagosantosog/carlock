@@ -54,11 +54,11 @@ export function PostCard({ post, isAdmin = false }: PostCardProps) {
     e.preventDefault(); 
     e.stopPropagation();
 
-    if (!firestore || !post.id) {
+    if (!firestore || !storage || !post.id) {
       toast({
         variant: "destructive",
         title: "Erro",
-        description: "Não foi possível deletar o post. Instância do Firestore ou ID do post ausente.",
+        description: "Não foi possível deletar o post. Instância do Firestore, Storage ou ID do post ausente.",
       });
       return;
     }
