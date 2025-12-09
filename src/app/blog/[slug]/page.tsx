@@ -6,7 +6,6 @@ import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firesto
 import { useFirestore } from '@/firebase';
 import { Post } from '@/types/blog';
 import { UserProfile } from '@/types/user';
-import Image from 'next/image';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -81,11 +80,6 @@ export default function PostPage({ params }: { params: Promise<{ slug: string }>
 
   return (
     <article className="container mx-auto py-10 px-4 max-w-4xl">
-      {post.coverImage && (
-        <div className="relative w-full h-96 mb-8 rounded-lg overflow-hidden">
-          <Image src={post.coverImage} alt={post.title} layout="fill" objectFit="cover" />
-        </div>
-      )}
       <header className="mb-8">
         <h1 className="text-4xl md:text-5xl font-extrabold leading-tight mb-4">{post.title}</h1>
         <p className="text-muted-foreground">

@@ -9,8 +9,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Badge } from '../ui/badge';
 import { deleteDoc, doc, getDoc } from 'firebase/firestore';
-import { useFirestore, useUser, useStorage } from '@/firebase';
-import { ref, deleteObject } from 'firebase/storage';
+import { useFirestore, useUser } from '@/firebase';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
@@ -45,7 +44,6 @@ function AuthorDisplay({ authorId }: { authorId: string }) {
 
 export function PostCard({ post, isAdmin = false }: PostCardProps) {
   const firestore = useFirestore();
-  const storage = useStorage();
   const { user } = useUser();
   const { toast } = useToast();
   const placeholder = PlaceHolderImages.find(p => p.id === 'blog-post-placeholder');
@@ -54,11 +52,11 @@ export function PostCard({ post, isAdmin = false }: PostCardProps) {
     e.preventDefault(); 
     e.stopPropagation();
 
-    if (!firestore || !storage || !post.id) {
+    if (!firestore || !post.id) {
       toast({
         variant: "destructive",
         title: "Erro",
-        description: "Não foi possível deletar o post. Instância do Firestore, Storage ou ID do post ausente.",
+        description: "Não foi possível deletar o post. Instância do Firestore ou ID do post ausente.",
       });
       return;
     }
@@ -83,34 +81,7 @@ export function PostCard({ post, isAdmin = false }: PostCardProps) {
           });
       };
       
-      if (post.coverImage && post.coverImage.includes('firebasestorage.googleapis.com')) {
-        try {
-          const imageRef = ref(storage, post.coverImage);
-          deleteObject(imageRef)
-            .then(() => {
-              deletePostDocument();
-            })
-            .catch((storageError: any) => {
-              // Se o objeto não for encontrado, ainda tentamos deletar o post
-              if (storageError.code === 'storage/object-not-found') {
-                deletePostDocument();
-              } else {
-                console.error("Erro ao deletar a imagem de capa: ", storageError);
-                toast({
-                  variant: "destructive",
-                  title: "Erro ao deletar imagem.",
-                  description: "A imagem de capa não pôde ser removida, mas a exclusão do post continuará.",
-                });
-                deletePostDocument(); 
-              }
-            });
-        } catch (e) {
-            console.error("Erro ao criar referência da imagem:", e);
-            deletePostDocument();
-        }
-      } else {
-        deletePostDocument();
-      }
+      deletePostDocument();
     }
   };
   
@@ -131,15 +102,17 @@ export function PostCard({ post, isAdmin = false }: PostCardProps) {
 
   const CardContentInner = () => (
     <>
-      <div className="relative w-full h-48">
-        <Image
-          src={post.coverImage || placeholder?.imageUrl || ''}
-          alt={post.title}
-          layout="fill"
-          objectFit="cover"
-          className="transition-transform duration-300 group-hover:scale-105"
-        />
-      </div>
+      {placeholder && (
+         <div className="relative w-full h-48">
+          <Image
+            src={placeholder.imageUrl}
+            alt={post.title}
+            layout="fill"
+            objectFit="cover"
+            className="transition-transform duration-300 group-hover:scale-105"
+          />
+        </div>
+      )}
       <CardHeader>
         <CardTitle className="text-xl font-bold leading-snug">
           {post.title}

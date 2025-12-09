@@ -4,7 +4,6 @@ export interface Post {
   id?: string;
   title: string;
   slug: string;
-  coverImage?: string;
   content: any; // Editor.js data
   tags: string[] | string;
   author: string;

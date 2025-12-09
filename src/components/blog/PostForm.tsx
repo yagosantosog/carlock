@@ -7,9 +7,8 @@ import { Post } from '@/types/blog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { useUser, useFirestore, useStorage } from '@/firebase';
+import { useUser, useFirestore } from '@/firebase';
 import { collection, addDoc, doc, updateDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { slugify } from '@/lib/utils';
 import dynamic from 'next/dynamic';
 import { useToast } from '../ui/use-toast';
@@ -26,7 +25,6 @@ interface PostFormProps {
 export function PostForm({ post }: PostFormProps) {
   const router = useRouter();
   const firestore = useFirestore();
-  const storage = useStorage();
   const { user } = useUser();
   const { toast } = useToast();
 
@@ -37,8 +35,6 @@ export function PostForm({ post }: PostFormProps) {
     } : { tags: [] }
   });
   
-  const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
-
   const title = watch('title');
 
   useEffect(() => {
@@ -58,14 +54,6 @@ export function PostForm({ post }: PostFormProps) {
     }
 
     try {
-      let coverImageUrl = post?.coverImage || undefined;
-
-      if (coverImageFile) {
-        const storageRef = ref(storage, `blog-covers/${Date.now()}_${coverImageFile.name}`);
-        await uploadBytes(storageRef, coverImageFile);
-        coverImageUrl = await getDownloadURL(storageRef);
-      }
-      
       const normalizedTags = Array.isArray(data.tags)
         ? data.tags.map(t => String(t).trim()).filter(Boolean)
         : (typeof data.tags === 'string' ? data.tags.split(',').map(tag => tag.trim()).filter(Boolean) : []);
@@ -83,10 +71,6 @@ export function PostForm({ post }: PostFormProps) {
         tags: normalizedTags,
         updatedAt: new Date().toISOString(),
       };
-
-      if (coverImageUrl) {
-        postData.coverImage = coverImageUrl;
-      }
 
       if (post && post.id) {
         const postRef = doc(firestore, 'posts', post.id);
@@ -125,11 +109,6 @@ export function PostForm({ post }: PostFormProps) {
       <div>
         <Label htmlFor="slug">Slug</Label>
         <Input id="slug" {...register('slug', { required: 'Slug é obrigatório' })} readOnly />
-      </div>
-      <div>
-        <Label htmlFor="coverImage">Imagem de Capa</Label>
-        <Input id="coverImage" type="file" onChange={(e) => setCoverImageFile(e.target.files?.[0] || null)} />
-        {post?.coverImage && !coverImageFile && <img src={post.coverImage} alt="Capa atual" className="mt-2 h-32 object-cover" />}
       </div>
       <div>
         <Label>Conteúdo</Label>

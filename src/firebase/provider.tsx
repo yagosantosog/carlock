@@ -6,7 +6,6 @@ import { initializeFirebase } from './index';
 import type { Auth, User } from 'firebase/auth';
 import { onAuthStateChanged } from 'firebase/auth';
 import type { Firestore } from 'firebase/firestore';
-import type { FirebaseStorage } from 'firebase/storage';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 
 const sdks = initializeFirebase();
@@ -14,7 +13,6 @@ const sdks = initializeFirebase();
 interface FirebaseContextState {
   auth: Auth;
   firestore: Firestore;
-  storage: FirebaseStorage;
   user: User | null;
   loading: boolean;
 }
@@ -39,7 +37,7 @@ export function FirebaseProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <FirebaseContext.Provider value={{ auth: sdks.auth, firestore: sdks.firestore, storage: sdks.storage, user, loading }}>
+    <FirebaseContext.Provider value={{ auth: sdks.auth, firestore: sdks.firestore, user, loading }}>
       <FirebaseErrorListener />
       {children}
     </FirebaseContext.Provider>
@@ -63,8 +61,4 @@ export function useUser() {
 
 export function useFirestore() {
   return useFirebase().firestore;
-}
-
-export function useStorage() {
-  return useFirebase().storage;
 }
