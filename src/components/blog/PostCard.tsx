@@ -10,26 +10,49 @@ import { Badge } from '../ui/badge';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 interface PostCardProps {
-  post: StrapiPost; // O PostCard sempre espera o formato Strapi unificado
+  post: StrapiPost;
   isAdmin?: boolean;
 }
 
 const STRAPI_URL = 'https://wonderful-cat-191f5294ba.strapiapp.com';
 
+// Função para mapear um post do Firebase para a estrutura esperada pelo PostCard
+const mapFirebasePostToCardData = (post: any) => {
+  return {
+    id: post.id,
+    slug: post.slug,
+    title: post.title,
+    publishedAt: post.createdAt,
+    coverImage: post.coverImage ? { data: { attributes: { url: post.coverImage, alternativeText: post.title } } } : null,
+    author: { data: { attributes: { name: 'Admin' } } },
+    content: post.content,
+    tags: { data: post.tags?.map((t: string) => ({ id: t, attributes: { name: t } })) || [] },
+  };
+};
+
 export function PostCard({ post, isAdmin = false }: PostCardProps) {
   const placeholder = PlaceHolderImages.find(p => p.id === 'blog-post-placeholder');
   
-  if (!post || !post.attributes) {
+  if (!post) {
     return null;
   }
   
-  const { slug, title, publishedAt, coverImage, author, content, tags } = post.attributes;
+  // Se for admin, mapeia os dados do Firebase. Caso contrário, usa os dados da API Strapi.
+  const cardData = isAdmin ? mapFirebasePostToCardData(post.attributes) : post.attributes;
+
+  if (!cardData) {
+    return null;
+  }
+
+  const { slug, title, publishedAt, coverImage, author, content, tags } = cardData;
 
   const postUrl = isAdmin ? `/admin/blog/${post.id}/edit` : `/blog/${slug}`;
 
   const getImageUrl = () => {
     if (coverImage?.data?.attributes?.url) {
-      return `${STRAPI_URL}${coverImage.data.attributes.url}`;
+      // Se a URL já for absoluta (começa com http), usa ela mesma. Senão, adiciona o prefixo.
+      const url = coverImage.data.attributes.url;
+      return url.startsWith('http') ? url : `${STRAPI_URL}${url}`;
     }
     return placeholder?.imageUrl;
   };
@@ -52,7 +75,7 @@ export function PostCard({ post, isAdmin = false }: PostCardProps) {
         }
     } catch (error) {
        // Se não for um JSON válido, trata como texto simples
-       const text = content.replace(/&nbsp;/g, ' ');
+       const text = String(content).replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ');
        return text.substring(0, 100) + (text.length > 100 ? '...' : '');
     }
     return '';
