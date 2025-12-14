@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Post } from '@/types/blog';
+import { Post as StrapiPost, PostAttributes } from '@/types/blog';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
@@ -10,41 +10,55 @@ import { Badge } from '../ui/badge';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 interface PostCardProps {
-  post: Post; // Agora sempre espera o formato Strapi
+  post: StrapiPost; // O PostCard sempre espera o formato Strapi unificado
+  isAdmin?: boolean;
 }
 
 const STRAPI_URL = 'https://wonderful-cat-191f5294ba.strapiapp.com';
 
-export function PostCard({ post }: PostCardProps) {
+export function PostCard({ post, isAdmin = false }: PostCardProps) {
   const placeholder = PlaceHolderImages.find(p => p.id === 'blog-post-placeholder');
-  const postUrl = `/blog/${post.attributes.slug}`;
-
-  const imageUrl = post.attributes.coverImage?.data?.attributes.url
-    ? `${STRAPI_URL}${post.attributes.coverImage.data.attributes.url}`
-    : placeholder?.imageUrl;
-
-  const imageAlt = post.attributes.coverImage?.data?.attributes.alternativeText || post.attributes.title;
   
-  const authorName = post.attributes.author?.data?.attributes.name || 'Autor Desconhecido';
+  if (!post || !post.attributes) {
+    // Retorna null ou um skeleton se o post for inválido para evitar crashes
+    return null;
+  }
+  
+  const { slug, title, publishedAt, coverImage, author, content, tags } = post.attributes;
+
+  const postUrl = isAdmin ? `/admin/blog/${post.id}/edit` : `/blog/${slug}`;
+
+  // Lógica de URL da imagem unificada
+  const getImageUrl = () => {
+    if (coverImage?.data?.attributes?.url) {
+      return `${STRAPI_URL}${coverImage.data.attributes.url}`;
+    }
+    // Para posts do firebase, coverImage pode ser uma string de URL direta
+    if (typeof coverImage === 'string') {
+      return coverImage;
+    }
+    return placeholder?.imageUrl;
+  };
+  
+  const imageUrl = getImageUrl();
+  const imageAlt = coverImage?.data?.attributes?.alternativeText || title;
+  
+  const authorName = author?.data?.attributes?.name || (isAdmin ? 'Admin' : 'Autor Desconhecido');
   
   const extractSummary = (content: any) => {
     try {
-      if (typeof content === 'string') {
-        // Tentativa de parse para formato Editor.js
+       if (typeof content === 'string') {
         try {
           const data = JSON.parse(content);
           if (Array.isArray(data.blocks)) {
             const firstParagraph = data.blocks.find((block: any) => block.type === 'paragraph');
-            return firstParagraph?.data.text.substring(0, 150) + '...' || '';
+            const text = firstParagraph?.data.text || '';
+            return text.substring(0, 150) + (text.length > 150 ? '...' : '');
           }
         } catch (e) {
-          // Se não for JSON, trata como string simples
-          return content.substring(0, 150) + '...';
+          // Trata como string simples se não for JSON
+          return content.substring(0, 150) + (content.length > 150 ? '...' : '');
         }
-      }
-      // Se o conteúdo for markdown (ou string simples da API)
-      if (typeof content === 'string') {
-        return content.substring(0, 150) + '...';
       }
       return '';
     } catch (e) {
@@ -67,25 +81,31 @@ export function PostCard({ post }: PostCardProps) {
         )}
         <CardHeader>
           <CardTitle className="text-xl font-bold leading-snug">
-            {post.attributes.title}
+            {title}
           </CardTitle>
         </CardHeader>
         <CardContent className="flex-grow">
           <p className="text-muted-foreground text-sm mb-4">
-            {post.attributes.publishedAt && format(new Date(post.attributes.publishedAt), "dd 'de' MMMM, yyyy", { locale: ptBR })} por {authorName}
+            {publishedAt && format(new Date(publishedAt), "dd 'de' MMMM, yyyy", { locale: ptBR })} por {authorName}
           </p>
-          <p className="text-sm text-muted-foreground">{extractSummary(post.attributes.content)}</p>
-          {post.attributes.tags?.data && Array.isArray(post.attributes.tags.data) && (
-            <div className="mt-4 flex flex-wrap gap-2">
-              {post.attributes.tags.data.map((tag) => (
-                <Badge key={tag.id} variant="secondary">{tag.attributes.name}</Badge>
-              ))}
-            </div>
-          )}
+          <p className="text-sm text-muted-foreground">{extractSummary(content)}</p>
+          
+          {/* Lógica de Tags para Strapi e Firebase */}
+          <div className="mt-4 flex flex-wrap gap-2">
+            {(tags?.data && Array.isArray(tags.data)) ? (
+                tags.data.map((tag) => (
+                  <Badge key={tag.id} variant="secondary">{tag.attributes.name}</Badge>
+                ))
+            ) : (Array.isArray(tags) && tags.length > 0) ? (
+                (tags as unknown as string[]).map((tag: string) => (
+                    <Badge key={tag} variant="secondary">{tag}</Badge>
+                ))
+            ) : null}
+          </div>
         </CardContent>
         <CardFooter className="mt-auto">
             <Button asChild variant="default" className="w-full">
-              <span aria-hidden="true">Ler Mais</span>
+              <span aria-hidden="true">{isAdmin ? 'Editar Post' : 'Ler Mais'}</span>
             </Button>
         </CardFooter>
       </Card>
