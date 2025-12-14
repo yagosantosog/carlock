@@ -1,31 +1,31 @@
+
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import Image from 'next/image';
 import { Metadata } from 'next';
 import { Badge } from '@/components/ui/badge';
 import { ContentRenderer } from '@/components/blog/ContentRenderer';
-import { Post } from '@/types/blog';
+import { Post, PostApiResponse } from '@/types/blog';
 
 const STRAPI_URL = 'https://wonderful-cat-191f5294ba.strapiapp.com';
 const API_URL_BASE = `${STRAPI_URL}/api/blog-posts`;
 
-// Função para buscar o post pelo slug
-async function getPost(slug: string): Promise<Post | null> {
-  const query = `?filters[slug][$eq]=${slug}&populate[author]=true&populate[coverImage]=true&populate[seo][populate][ogImage]=true`;
+async function getPostBySlug(slug: string): Promise<Post | null> {
+  const query = `?filters[slug][$eq]=${slug}&populate[author]=true&populate[coverImage]=true&populate[seo][populate][ogImage]=true&populate[tags]=true`;
   const url = `${API_URL_BASE}${query}`;
 
   try {
     const res = await fetch(url, {
-      next: { revalidate: 60 }
+      cache: 'no-store',
     });
 
     if (!res.ok) {
       throw new Error(`Failed to fetch post: ${res.statusText}`);
     }
 
-    const json = await res.json();
+    const json = await res.json() as PostApiResponse;
     if (json.data && json.data.length > 0) {
-      return json.data[0] as Post;
+      return json.data[0];
     }
     return null;
   } catch (error) {
@@ -34,19 +34,22 @@ async function getPost(slug: string): Promise<Post | null> {
   }
 }
 
-// Gerar metadados dinâmicos
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const post = await getPost(params.slug);
+  const post = await getPostBySlug(params.slug);
 
-  if (!post || !post.attributes.seo) {
+  if (!post) {
     return {
       title: "Post não encontrado",
       description: "O post que você está procurando não existe ou foi movido."
-    }
+    };
   }
 
-  const { metaTitle, metaDescription, ogImage } = post.attributes.seo;
-  const ogImageUrl = ogImage?.data?.attributes.url ? `${STRAPI_URL}${ogImage.data.attributes.url}` : undefined;
+  const metaTitle = post.seo?.metaTitle || post.title;
+  const metaDescription = post.seo?.metaDescription || '';
+  
+  const ogImageUrl = post.seo?.ogImage?.url 
+    ? (post.seo.ogImage.url.startsWith('http') ? post.seo.ogImage.url : `${STRAPI_URL}${post.seo.ogImage.url}`)
+    : (post.coverImage?.url ? (post.coverImage.url.startsWith('http') ? post.coverImage.url : `${STRAPI_URL}${post.coverImage.url}`) : undefined);
 
   return {
     title: metaTitle,
@@ -59,15 +62,14 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-// Opcional: Gerar rotas estáticas no momento do build
 export async function generateStaticParams() {
   try {
     const res = await fetch(`${API_URL_BASE}?fields[0]=slug`);
     if (!res.ok) return [];
 
-    const { data } = await res.json();
-    return data.map((post: { attributes: { slug: string } }) => ({
-      slug: post.attributes.slug,
+    const { data } = await res.json() as PostApiResponse;
+    return data.map((post) => ({
+      slug: post.slug,
     }));
   } catch {
     return [];
@@ -75,17 +77,17 @@ export async function generateStaticParams() {
 }
 
 export default async function PostPage({ params }: { params: { slug: string } }) {
-  const post = await getPost(params.slug);
+  const post = await getPostBySlug(params.slug);
 
   if (!post) {
     return <div className="container mx-auto py-10 text-center">Post não encontrado.</div>;
   }
 
-  const { title, publishedAt, content, coverImage, author, tags } = post.attributes;
-
-  const imageUrl = coverImage?.data?.attributes.url ? `${STRAPI_URL}${coverImage.data.attributes.url}` : null;
-  const imageAlt = coverImage?.data?.attributes.alternativeText || title;
-  const authorName = author?.data?.attributes.name || 'Autor Desconhecido';
+  const { title, publishedAt, content, coverImage, author, tags } = post;
+  
+  const imageUrl = coverImage?.url ? (coverImage.url.startsWith('http') ? coverImage.url : `${STRAPI_URL}${coverImage.url}`) : null;
+  const imageAlt = coverImage?.alternativeText || title;
+  const authorName = author?.name || 'Autor Desconhecido';
   const formattedDate = publishedAt ? format(new Date(publishedAt), "dd 'de' MMMM 'de' yyyy", { locale: ptBR }) : '';
 
   return (
@@ -113,11 +115,11 @@ export default async function PostPage({ params }: { params: { slug: string } })
         <ContentRenderer data={content} />
       </div>
 
-      {tags?.data && tags.data.length > 0 && (
+      {tags && tags.length > 0 && (
         <div className="mt-8 text-center">
-          {tags.data.map((tag) => (
-            <Badge key={tag.id} variant="secondary" className="mr-2 mb-2">
-              {tag.attributes.name}
+          {tags.map((tag, index) => (
+            <Badge key={index} variant="secondary" className="mr-2 mb-2">
+              {tag.name}
             </Badge>
           ))}
         </div>

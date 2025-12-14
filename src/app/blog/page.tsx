@@ -1,5 +1,6 @@
+
 import { PostList } from '@/components/blog/PostList';
-import { Post } from '@/types/blog';
+import { Post, PostApiResponse } from '@/types/blog';
 
 const STRAPI_URL = 'https://wonderful-cat-191f5294ba.strapiapp.com';
 const API_URL = `${STRAPI_URL}/api/blog-posts?populate[author]=true&populate[coverImage][fields][0]=url&populate[coverImage][fields][1]=alternativeText&populate[seo]=true&sort=publishedAt:desc`;
@@ -7,15 +8,15 @@ const API_URL = `${STRAPI_URL}/api/blog-posts?populate[author]=true&populate[cov
 async function getPosts(): Promise<Post[]> {
   try {
     const res = await fetch(API_URL, {
-      next: { revalidate: 60 } // Revalida a cada 60 segundos
+      cache: 'no-store' // ou 'force-cache' com revalidate
     });
 
     if (!res.ok) {
       throw new Error(`Failed to fetch posts: ${res.statusText}`);
     }
 
-    const json = await res.json();
-    return json.data as Post[];
+    const json = await res.json() as PostApiResponse;
+    return json.data;
   } catch (error) {
     console.error("Error fetching posts:", error);
     return [];

@@ -1,7 +1,8 @@
+
 'use client';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Post as StrapiPost } from '@/types/blog';
+import { Post } from '@/types/blog';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
@@ -10,7 +11,7 @@ import { Badge } from '../ui/badge';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 interface PostCardProps {
-  post: StrapiPost;
+  post: Post;
 }
 
 const STRAPI_URL = 'https://wonderful-cat-191f5294ba.strapiapp.com';
@@ -18,45 +19,46 @@ const STRAPI_URL = 'https://wonderful-cat-191f5294ba.strapiapp.com';
 export function PostCard({ post }: PostCardProps) {
   const placeholder = PlaceHolderImages.find(p => p.id === 'blog-post-placeholder');
   
-  if (!post || !post.attributes) {
+  if (!post) {
     return null;
   }
   
-  const { slug, title, publishedAt, coverImage, author, content, tags } = post.attributes;
+  const { slug, title, publishedAt, coverImage, author, content, tags } = post;
 
   const postUrl = `/blog/${slug}`;
 
   const getImageUrl = () => {
-    if (coverImage?.data?.attributes?.url) {
-      const url = coverImage.data.attributes.url;
+    if (coverImage?.url) {
+      const url = coverImage.url;
       return url.startsWith('http') ? url : `${STRAPI_URL}${url}`;
     }
     return placeholder?.imageUrl;
   };
   
   const imageUrl = getImageUrl();
-  const imageAlt = coverImage?.data?.attributes?.alternativeText || title;
+  const imageAlt = coverImage?.alternativeText || title;
   
-  const authorName = author?.data?.attributes?.name || 'Autor Desconhecido';
+  const authorName = author?.name || 'Autor Desconhecido';
   
   const extractSummary = (content: any): string => {
     if (!content) return '';
     try {
-      if (typeof content === 'string') {
-        const parsed = JSON.parse(content);
-        const firstParagraph = parsed.blocks?.find((block: any) => block.type === 'paragraph');
+      // Handle JSON string from Editor.js
+      const parsed = typeof content === 'string' ? JSON.parse(content) : content;
+      if (parsed && Array.isArray(parsed.blocks)) {
+        const firstParagraph = parsed.blocks.find((block: any) => block.type === 'paragraph');
         if (firstParagraph) {
-          const text = firstParagraph.data.text.replace(/&nbsp;/g, ' ');
+          const text = firstParagraph.data.text.replace(/&nbsp;|<[^>]+>/g, ' ').trim();
           return text.substring(0, 100) + (text.length > 100 ? '...' : '');
         }
       }
     } catch (error) {
-       const text = String(content).replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ');
+       // Handle plain string content
+       const text = String(content).replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim();
        return text.substring(0, 100) + (text.length > 100 ? '...' : '');
     }
     return '';
   };
-
 
   return (
     <Link href={postUrl} className="group">
@@ -83,11 +85,9 @@ export function PostCard({ post }: PostCardProps) {
           <p className="text-sm text-muted-foreground">{extractSummary(content)}</p>
           
           <div className="mt-4 flex flex-wrap gap-2">
-            {(tags?.data && Array.isArray(tags.data)) ? (
-                tags.data.map((tag) => (
-                  <Badge key={tag.id} variant="secondary">{tag.attributes.name}</Badge>
-                ))
-            ) : null}
+            {tags && Array.isArray(tags) && tags.map((tag, index) => (
+              <Badge key={index} variant="secondary">{tag.name}</Badge>
+            ))}
           </div>
         </CardContent>
         <CardFooter className="mt-auto">

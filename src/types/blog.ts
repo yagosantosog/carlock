@@ -1,55 +1,32 @@
-export interface StrapiImageFormat {
+
+export interface StrapiImage {
   url: string;
+  alternativeText?: string | null;
 }
 
-export interface StrapiImageData {
-  id: number;
-  attributes: {
-    alternativeText: string | null;
-    url: string;
-    formats?: {
-      thumbnail: StrapiImageFormat;
-      small: StrapiImageFormat;
-      medium: StrapiImageFormat;
-      large: StrapiImageFormat;
-    };
-  };
-}
-
-export interface StrapiAuthorData {
-  id: number;
-  attributes: {
-    name: string;
-  };
+export interface StrapiAuthor {
+  name: string;
 }
 
 export interface SeoData {
-    id: number;
-    metaTitle: string;
-    metaDescription: string;
-    ogImage?: { data: StrapiImageData | null };
-}
-
-export interface PostAttributes {
-  title: string;
-  slug: string;
-  content: any; // Can be a JSON string from Editor.js
-  createdAt: string;
-  updatedAt: string;
-  publishedAt: string;
-  tags?: { data: { id: number; attributes: { name: string } }[] } | null;
-  author: {
-    data: StrapiAuthorData | null;
-  };
-  coverImage: {
-    data: StrapiImageData | null;
-  };
-  seo: SeoData | null;
+  metaTitle?: string;
+  metaDescription?: string;
+  ogImage?: StrapiImage;
 }
 
 export interface Post {
   id: number;
-  attributes: PostAttributes;
+  documentId: string;
+  title: string;
+  slug: string;
+  content: any; // JSON string from Editor.js
+  publishedAt: string;
+  createdAt: string;
+  updatedAt: string;
+  coverImage?: StrapiImage;
+  author?: StrapiAuthor;
+  seo?: SeoData;
+  tags?: { name: string }[];
 }
 
 export interface PostApiResponse {
