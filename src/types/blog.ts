@@ -33,7 +33,7 @@ export interface SeoData {
 export interface PostAttributes {
   title: string;
   slug: string;
-  content: string; // JSON string from Editor.js
+  content: any; // Can be a JSON string from Editor.js
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
