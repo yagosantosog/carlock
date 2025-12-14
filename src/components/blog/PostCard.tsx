@@ -72,7 +72,6 @@ export function PostCard({ post, isAdmin = false }: PostCardProps) {
             });
           })
           .catch((serverError) => {
-            // Em vez de usar toast aqui, emitimos o erro para o listener global
             const permissionError = new FirestorePermissionError({
               path: postDocRef.path,
               operation: 'delete',
@@ -154,15 +153,9 @@ export function PostCard({ post, isAdmin = false }: PostCardProps) {
 
   return (
     <Card className="flex flex-col h-full overflow-hidden transition-shadow duration-300 hover:shadow-lg">
-      {isAdmin ? (
-        <div className="flex flex-col h-full">
-          <CardContentInner />
-        </div>
-      ) : (
-        <Link href={postUrl} className="flex flex-col h-full">
-          <CardContentInner />
-        </Link>
-      )}
+      <div className="flex flex-col h-full">
+        <CardContentInner />
+      </div>
     </Card>
   );
 }
