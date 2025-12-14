@@ -1,29 +1,29 @@
-'use client';
-
-import { useEffect, useState } from 'react';
-import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
-import { useFirestore } from '@/firebase';
-import { Post } from '@/types/blog';
 import { PostList } from '@/components/blog/PostList';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Post } from '@/types/blog';
 
-export default function BlogPage() {
-  const firestore = useFirestore();
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
+const STRAPI_URL = 'https://wonderful-cat-191f5294ba.strapiapp.com';
+const API_URL = `${STRAPI_URL}/api/blog-posts?populate[author]=true&populate[coverImage][fields][0]=url&populate[coverImage][fields][1]=alternativeText&populate[seo]=true&sort=publishedAt:desc`;
 
-  useEffect(() => {
-    if (!firestore) return;
-
-    const q = query(collection(firestore, 'posts'), orderBy('createdAt', 'desc'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const postsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post));
-      setPosts(postsData);
-      setLoading(false);
+async function getPosts(): Promise<Post[]> {
+  try {
+    const res = await fetch(API_URL, {
+      next: { revalidate: 60 } // Revalida a cada 60 segundos
     });
 
-    return () => unsubscribe();
-  }, [firestore]);
+    if (!res.ok) {
+      throw new Error(`Failed to fetch posts: ${res.statusText}`);
+    }
+
+    const json = await res.json();
+    return json.data as Post[];
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+    return [];
+  }
+}
+
+export default async function BlogPage() {
+  const posts = await getPosts();
 
   return (
     <div className="container mx-auto py-10 px-4">
@@ -33,21 +33,7 @@ export default function BlogPage() {
           Notícias, dicas e atualizações sobre segurança veicular.
         </p>
       </div>
-      {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="flex flex-col space-y-3">
-              <Skeleton className="h-[225px] w-full rounded-xl" />
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-[250px]" />
-                <Skeleton className="h-4 w-[200px]" />
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <PostList posts={posts} />
-      )}
+      <PostList posts={posts} />
     </div>
   );
 }

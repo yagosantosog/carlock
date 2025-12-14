@@ -1,99 +1,95 @@
-
-'use client';
-
-import { useEffect, useState, use } from 'react';
-import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
-import { useFirestore } from '@/firebase';
-import { Post } from '@/types/blog';
-import { UserProfile } from '@/types/user';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Skeleton } from '@/components/ui/skeleton';
+import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { ContentRenderer } from '@/components/blog/ContentRenderer';
+import { Post } from '@/types/blog';
+import { Skeleton } from '@/components/ui/skeleton';
 
-function AuthorDisplay({ authorId }: { authorId: string }) {
-  const firestore = useFirestore();
-  const [author, setAuthor] = useState<UserProfile | null>(null);
+const STRAPI_URL = 'https://wonderful-cat-191f5294ba.strapiapp.com';
+const API_URL_BASE = `${STRAPI_URL}/api/blog-posts`;
 
-  useEffect(() => {
-    if (!firestore || !authorId) return;
-    const fetchAuthor = async () => {
-      const userRef = doc(firestore, 'users', authorId);
-      const userSnap = await getDoc(userRef);
-      if (userSnap.exists()) {
-        setAuthor(userSnap.data() as UserProfile);
-      }
-    };
-    fetchAuthor();
-  }, [firestore, authorId]);
+// Função para buscar o post pelo slug
+async function getPost(slug: string): Promise<Post | null> {
+  const query = `?filters[slug][$eq]=${slug}&populate[author]=true&populate[coverImage][fields][0]=url&populate[coverImage][fields][1]=alternativeText&populate[seo]=true`;
+  const url = `${API_URL_BASE}${query}`;
 
-  return <>{author ? author.username : 'Carregando...'}</>;
+  try {
+    const res = await fetch(url, {
+      next: { revalidate: 60 }
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to fetch post: ${res.statusText}`);
+    }
+
+    const json = await res.json();
+    if (json.data && json.data.length > 0) {
+      return json.data[0] as Post;
+    }
+    return null;
+  } catch (error) {
+    console.error(`Error fetching post with slug ${slug}:`, error);
+    return null;
+  }
 }
 
+// Opcional: Gerar rotas estáticas no momento do build
+export async function generateStaticParams() {
+  try {
+    const res = await fetch(`${API_URL_BASE}?fields[0]=slug`);
+    if (!res.ok) return [];
 
-export default function PostPage({ params }: { params: Promise<{ slug: string }> }) {
-  const firestore = useFirestore();
-  const [post, setPost] = useState<Post | null>(null);
-  const [loading, setLoading] = useState(true);
-  const { slug } = use(params);
-
-  useEffect(() => {
-    if (!firestore) return;
-
-    const fetchPost = async () => {
-      const q = query(collection(firestore, 'posts'), where('slug', '==', slug));
-      const querySnapshot = await getDocs(q);
-      if (!querySnapshot.empty) {
-        const doc = querySnapshot.docs[0];
-        setPost({ id: doc.id, ...doc.data() } as Post);
-      }
-      setLoading(false);
-    };
-
-    fetchPost();
-  }, [firestore, slug]);
-
-  if (loading) {
-    return (
-      <div className="container mx-auto py-10 px-4 max-w-4xl">
-        <Skeleton className="h-[400px] w-full rounded-xl mb-8" />
-        <Skeleton className="h-8 w-3/4 mb-4" />
-        <Skeleton className="h-4 w-1/4 mb-8" />
-        <div className="space-y-4">
-          <Skeleton className="h-6 w-full" />
-          <Skeleton className="h-6 w-5/6" />
-          <Skeleton className="h-6 w-full" />
-        </div>
-      </div>
-    );
+    const { data } = await res.json();
+    return data.map((post: { attributes: { slug: string } }) => ({
+      slug: post.attributes.slug,
+    }));
+  } catch {
+    return [];
   }
+}
+
+export default async function PostPage({ params }: { params: { slug: string } }) {
+  const post = await getPost(params.slug);
 
   if (!post) {
     return <div className="container mx-auto py-10 text-center">Post não encontrado.</div>;
   }
 
-  const formatDate = (date: string | Date) => {
-    const dateObj = typeof date === 'string' ? new Date(date) : date;
-    return format(dateObj, "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
-  };
+  const { title, publishedAt, content, coverImage, author, tags } = post.attributes;
+
+  const imageUrl = coverImage?.data?.attributes.url ? `${STRAPI_URL}${coverImage.data.attributes.url}` : null;
+  const imageAlt = coverImage?.data?.attributes.alternativeText || title;
+  const authorName = author?.data?.attributes.name || 'Autor Desconhecido';
+  const formattedDate = publishedAt ? format(new Date(publishedAt), "dd 'de' MMMM 'de' yyyy", { locale: ptBR }) : '';
 
   return (
     <article className="container mx-auto py-10 px-4 max-w-4xl">
-      <header className="mb-8">
-        <h1 className="text-4xl md:text-5xl font-extrabold leading-tight mb-4">{post.title}</h1>
+      {imageUrl && (
+        <div className="relative w-full h-64 sm:h-80 md:h-96 rounded-lg overflow-hidden mb-8 shadow-lg">
+          <Image
+            src={imageUrl}
+            alt={imageAlt}
+            fill
+            className="object-cover"
+            priority
+          />
+        </div>
+      )}
+      <header className="mb-8 text-center">
+        <h1 className="text-4xl md:text-5xl font-extrabold leading-tight mb-4">{title}</h1>
         <p className="text-muted-foreground">
-          Por <AuthorDisplay authorId={post.author as string} /> em {post.createdAt && formatDate(post.createdAt as string)}
+          Por {authorName} em {formattedDate}
         </p>
       </header>
       <div className="prose prose-lg dark:prose-invert max-w-none mx-auto">
-        <ContentRenderer data={post.content} />
+        <ContentRenderer data={content} />
       </div>
-      {post.tags && Array.isArray(post.tags) && post.tags.length > 0 && (
-        <div className="mt-8">
-          {post.tags.map((tag) => (
-            <Badge key={tag} variant="secondary" className="mr-2 mb-2">
-              {tag}
+      {tags?.data && tags.data.length > 0 && (
+        <div className="mt-8 text-center">
+          {tags.data.map((tag) => (
+            <Badge key={tag.id} variant="secondary" className="mr-2 mb-2">
+              {tag.attributes.name}
             </Badge>
           ))}
         </div>

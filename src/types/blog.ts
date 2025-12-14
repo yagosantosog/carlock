@@ -1,12 +1,58 @@
-import { Timestamp } from "firebase/firestore";
+export interface StrapiImageFormat {
+  url: string;
+}
 
-export interface Post {
-  id?: string;
+export interface StrapiImageData {
+  id: number;
+  attributes: {
+    alternativeText: string | null;
+    url: string;
+    formats?: {
+      thumbnail: StrapiImageFormat;
+      small: StrapiImageFormat;
+      medium: StrapiImageFormat;
+      large: StrapiImageFormat;
+    };
+  };
+}
+
+export interface StrapiAuthorData {
+  id: number;
+  attributes: {
+    name: string;
+    // ... outros campos do autor
+  };
+}
+
+export interface PostAttributes {
   title: string;
   slug: string;
-  content: any; // Editor.js data
-  tags: string[] | string;
-  author: string;
-  createdAt: Timestamp | string;
-  updatedAt: Timestamp | string;
+  content: string; // JSON string from Editor.js
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+  tags?: { data: { id: number; attributes: { name: string } }[] } | null;
+  author: {
+    data: StrapiAuthorData | null;
+  };
+  coverImage: {
+    data: StrapiImageData | null;
+  };
+}
+
+export interface Post {
+  id: number;
+  attributes: PostAttributes;
+}
+
+export interface PostApiResponse {
+  data: Post[];
+  meta: {
+    pagination: {
+      page: number;
+      pageSize: number;
+      pageCount: number;
+      total: number;
+    };
+  };
 }
