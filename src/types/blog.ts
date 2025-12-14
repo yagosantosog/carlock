@@ -20,8 +20,14 @@ export interface StrapiAuthorData {
   id: number;
   attributes: {
     name: string;
-    // ... outros campos do autor
   };
+}
+
+export interface SeoData {
+    id: number;
+    metaTitle: string;
+    metaDescription: string;
+    ogImage?: { data: StrapiImageData | null };
 }
 
 export interface PostAttributes {
@@ -38,6 +44,7 @@ export interface PostAttributes {
   coverImage: {
     data: StrapiImageData | null;
   };
+  seo: SeoData | null;
 }
 
 export interface Post {

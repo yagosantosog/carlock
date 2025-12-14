@@ -20,7 +20,6 @@ export function PostCard({ post, isAdmin = false }: PostCardProps) {
   const placeholder = PlaceHolderImages.find(p => p.id === 'blog-post-placeholder');
   
   if (!post || !post.attributes) {
-    // Retorna null ou um skeleton se o post for inválido para evitar crashes
     return null;
   }
   
@@ -28,14 +27,9 @@ export function PostCard({ post, isAdmin = false }: PostCardProps) {
 
   const postUrl = isAdmin ? `/admin/blog/${post.id}/edit` : `/blog/${slug}`;
 
-  // Lógica de URL da imagem unificada
   const getImageUrl = () => {
     if (coverImage?.data?.attributes?.url) {
       return `${STRAPI_URL}${coverImage.data.attributes.url}`;
-    }
-    // Para posts do firebase, coverImage pode ser uma string de URL direta
-    if (typeof coverImage === 'string') {
-      return coverImage;
     }
     return placeholder?.imageUrl;
   };
@@ -45,26 +39,25 @@ export function PostCard({ post, isAdmin = false }: PostCardProps) {
   
   const authorName = author?.data?.attributes?.name || (isAdmin ? 'Admin' : 'Autor Desconhecido');
   
-  const extractSummary = (content: any) => {
+  const extractSummary = (content: any): string => {
+    if (!content) return '';
     try {
-       if (typeof content === 'string') {
-        try {
-          const data = JSON.parse(content);
-          if (Array.isArray(data.blocks)) {
-            const firstParagraph = data.blocks.find((block: any) => block.type === 'paragraph');
-            const text = firstParagraph?.data.text || '';
-            return text.substring(0, 150) + (text.length > 150 ? '...' : '');
+        if (typeof content === 'string') {
+          const parsed = JSON.parse(content);
+          const firstParagraph = parsed.blocks?.find((block: any) => block.type === 'paragraph');
+          if (firstParagraph) {
+            const text = firstParagraph.data.text.replace(/&nbsp;/g, ' ');
+            return text.substring(0, 100) + (text.length > 100 ? '...' : '');
           }
-        } catch (e) {
-          // Trata como string simples se não for JSON
-          return content.substring(0, 150) + (content.length > 150 ? '...' : '');
         }
-      }
-      return '';
-    } catch (e) {
-      return '';
+    } catch (error) {
+       // Se não for um JSON válido, trata como texto simples
+       const text = content.replace(/&nbsp;/g, ' ');
+       return text.substring(0, 100) + (text.length > 100 ? '...' : '');
     }
+    return '';
   };
+
 
   return (
     <Link href={postUrl} className="group">
@@ -83,22 +76,17 @@ export function PostCard({ post, isAdmin = false }: PostCardProps) {
           <CardTitle className="text-xl font-bold leading-snug">
             {title}
           </CardTitle>
+          <p className="text-sm text-muted-foreground pt-2">
+            {publishedAt ? format(new Date(publishedAt), "dd 'de' MMMM, yyyy", { locale: ptBR }) : ''} por {authorName}
+          </p>
         </CardHeader>
         <CardContent className="flex-grow">
-          <p className="text-muted-foreground text-sm mb-4">
-            {publishedAt && format(new Date(publishedAt), "dd 'de' MMMM, yyyy", { locale: ptBR })} por {authorName}
-          </p>
           <p className="text-sm text-muted-foreground">{extractSummary(content)}</p>
           
-          {/* Lógica de Tags para Strapi e Firebase */}
           <div className="mt-4 flex flex-wrap gap-2">
             {(tags?.data && Array.isArray(tags.data)) ? (
                 tags.data.map((tag) => (
                   <Badge key={tag.id} variant="secondary">{tag.attributes.name}</Badge>
-                ))
-            ) : (Array.isArray(tags) && tags.length > 0) ? (
-                (tags as unknown as string[]).map((tag: string) => (
-                    <Badge key={tag} variant="secondary">{tag}</Badge>
                 ))
             ) : null}
           </div>

@@ -1,13 +1,11 @@
 import { Post, PostAttributes } from '@/types/blog';
-
 import { PostCard } from './PostCard';
 
 interface PostListProps {
-  posts: any[]; // Aceita qualquer array para fazer a conversão
+  posts: any[]; 
   isAdmin?: boolean;
 }
 
-// Função para mapear um post do Firebase para o formato Strapi
 const mapFirebasePostToStrapi = (post: any): Post => {
   return {
     id: post.id,
@@ -17,11 +15,12 @@ const mapFirebasePostToStrapi = (post: any): Post => {
       content: post.content,
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
-      publishedAt: post.createdAt, // Firebase não tem 'publishedAt', usamos 'createdAt'
-      tags: post.tags, // As tags já são um array de strings
-      author: { data: null }, // Admin não mostra autor específico
-      coverImage: { data: null, url: post.coverImage }, // Passa a URL direta se existir
-    } as unknown as PostAttributes, // Força a tipagem pois alguns campos não batem 100%
+      publishedAt: post.createdAt, 
+      tags: { data: post.tags?.map((t: string) => ({ id: t, attributes: { name: t } })) || [] },
+      author: { data: { id: 1, attributes: { name: 'Admin' } } }, 
+      coverImage: post.coverImage ? { data: { id: 1, attributes: { url: post.coverImage, alternativeText: post.title } } } : null,
+      seo: null,
+    } as unknown as PostAttributes,
   };
 };
 
@@ -30,8 +29,6 @@ export function PostList({ posts, isAdmin = false }: PostListProps) {
     return <div className="text-center text-muted-foreground">Nenhum post encontrado.</div>;
   }
 
-  // Se for admin, mapeia os posts do Firebase para o formato Strapi.
-  // Se não, assume que já está no formato correto da API.
   const formattedPosts = isAdmin ? posts.map(mapFirebasePostToStrapi) : posts;
 
   return (
