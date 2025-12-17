@@ -1,5 +1,5 @@
 
-// A estrutura `attributes` foi removida, pois a API v5 retorna um formato "achatado".
+// Estrutura de dados alinhada com a resposta "achatada" da API Strapi v5
 
 export interface StrapiImage {
   id: number;
@@ -17,7 +17,12 @@ export interface SeoData {
   id: number;
   metaTitle: string | null;
   metaDescription: string | null;
-  ogImage?: StrapiImage | null; // Adicionado para consistência, embora a URL principal seja a coverImage
+  ogImage?: StrapiImage | null;
+}
+
+export interface Tag {
+    id: number;
+    name: string;
 }
 
 export interface Post {
@@ -31,7 +36,7 @@ export interface Post {
   coverImage: StrapiImage | null;
   author: StrapiAuthor | null;
   seo: SeoData | null;
-  tags?: { name: string }[];
+  tags: Tag[];
 }
 
 export interface PostApiResponse {

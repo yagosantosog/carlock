@@ -98,9 +98,9 @@ export default async function PostPage({ params }: Props) {
         <div className="mt-8">
           <h3 className="text-lg font-semibold mb-2">Tags:</h3>
           <div className="flex flex-wrap gap-2">
-            {tags.map((tag, index) => (
-                <Badge key={index} variant="secondary">
-                {tag.name}
+            {tags.map((tag) => (
+                <Badge key={tag.id} variant="secondary">
+                  {tag.name}
                 </Badge>
             ))}
           </div>

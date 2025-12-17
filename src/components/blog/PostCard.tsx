@@ -6,7 +6,6 @@ import { ptBR } from 'date-fns/locale';
 
 import { Post } from '@/types/blog';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '../ui/badge';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
@@ -87,11 +86,13 @@ export function PostCard({ post }: PostCardProps) {
         <CardContent className="flex-grow">
             <p className="text-sm text-muted-foreground">{extractSummary(content)}</p>
             
-            <div className="mt-4 flex flex-wrap gap-2">
-            {tags && tags.length > 0 && tags.slice(0, 3).map((tag, index) => (
-                <Badge key={index} variant="secondary">{tag.name}</Badge>
-            ))}
-            </div>
+            {tags && tags.length > 0 && (
+                 <div className="mt-4 flex flex-wrap gap-2">
+                    {tags.slice(0, 3).map((tag) => (
+                        <Badge key={tag.id} variant="secondary">{tag.name}</Badge>
+                    ))}
+                </div>
+            )}
         </CardContent>
         <CardFooter className="mt-auto">
             <div className="w-full text-primary font-semibold group-hover:underline">

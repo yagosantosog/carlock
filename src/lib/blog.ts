@@ -3,8 +3,7 @@ import type { Post, PostApiResponse } from '@/types/blog';
 
 const STRAPI_URL = 'https://wonderful-cat-191f5294ba.strapiapp.com/api/blog-posts';
 
-// Otimização: A query é a mesma, podemos defini-la uma vez.
-// Popula o autor, a imagem da capa, as tags e o SEO.
+// Query que popula os campos necessários conforme a estrutura da API v5
 const API_QUERY = '?populate[author]=true&populate[coverImage]=true&populate[tags]=true&populate[seo]=true&sort=publishedAt:desc';
 const API_URL = `${STRAPI_URL}${API_QUERY}`;
 
@@ -15,8 +14,6 @@ const API_URL = `${STRAPI_URL}${API_QUERY}`;
  */
 export async function getPosts(): Promise<Post[]> {
   try {
-    // Usamos 'no-store' para garantir que os dados estejam sempre atualizados.
-    // Para produção, 'next: { revalidate: 3600 }' seria uma boa opção.
     const res = await fetch(API_URL, { cache: 'no-store' });
 
     if (!res.ok) {
@@ -37,7 +34,6 @@ export async function getPosts(): Promise<Post[]> {
 
 /**
  * Busca um único post pelo seu slug.
- * Filtra a partir dos posts já buscados para evitar requisições duplicadas.
  * @param {string} slug - O slug do post a ser encontrado.
  * @returns {Promise<Post | null>} Uma promessa que resolve para o post encontrado ou null.
  */
@@ -46,13 +42,26 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
     return null;
   }
   
-  // Para buscar um post específico, buscamos todos e filtramos.
-  // Isso é eficiente porque `getPosts` é cacheado pelo Next.js (se não usar 'no-store').
-  
+  // Constrói a URL para buscar um post específico pelo slug
+  const postApiUrl = `${STRAPI_URL}?filters[slug][$eq]=${slug}&${API_QUERY.substring(1)}`;
+
   try {
-    const posts = await getPosts();
-    const post = posts.find((p) => p.slug === slug);
-    return post || null;
+    const res = await fetch(postApiUrl, { cache: 'no-store' });
+
+    if (!res.ok) {
+        console.error(`Failed to fetch post by slug (${slug}): ${res.status} ${res.statusText}`);
+        return null;
+    }
+    
+    const json = (await res.json()) as PostApiResponse;
+    
+    // Se a busca retornar dados, pegamos o primeiro (e único) post
+    if (json.data && json.data.length > 0) {
+      return json.data[0];
+    }
+    
+    return null;
+
   } catch (error) {
     console.error(`An error occurred while fetching post by slug (${slug}):`, error);
     return null;

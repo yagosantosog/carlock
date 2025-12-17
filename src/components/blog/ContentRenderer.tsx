@@ -5,6 +5,7 @@ import type { Post } from '@/types/blog';
 // Interface para um bloco individual de conteúdo
 interface Block {
   type: string;
+  level?: number;
   children: {
     type: string;
     text: string;
@@ -30,15 +31,14 @@ const BlockRenderer: React.FC<{ block: Block }> = ({ block }) => {
     case 'paragraph':
       return <p className="mb-4">{text}</p>;
     
-    // Adicione outros tipos de bloco aqui, como 'heading', 'list', etc.
     case 'heading':
-      // Exemplo para cabeçalho, supondo que o nível está no bloco
-      const level = (block as any).level || 1;
+      // Exemplo para cabeçalho, o nível está no bloco
+      const level = block.level || 1;
       const HeadingTag = `h${level}` as keyof JSX.IntrinsicElements;
       return <HeadingTag className="font-bold my-4">{text}</HeadingTag>;
 
     default:
-      // Fallback para tipos de bloco não reconhecidos
+      // Fallback para tipos de bloco não reconhecidos, como 'list' etc.
       return <p className="mb-4">{text}</p>;
   }
 };

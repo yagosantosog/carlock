@@ -1,6 +1,12 @@
 
 import { getPosts } from '@/lib/blog';
 import { PostList } from '@/components/blog/PostList';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+    title: 'Blog | CarLock',
+    description: 'Notícias, dicas e atualizações sobre segurança veicular e tecnologia de rastreamento.',
+};
 
 // Este é um Server Component, executado no servidor.
 export default async function BlogPage() {
