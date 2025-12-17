@@ -25,12 +25,7 @@ const extractSummary = (content: Post['content']): string => {
     if (firstParagraph && Array.isArray(firstParagraph.children)) {
       // Concatena o texto de todos os filhos do parágrafo
       const text = firstParagraph.children.map(child => child.text).join(' ');
-      const cleanText = text.replace(/&nbsp;|<[^>]+>/g, ' ').trim();
-      
-      if (cleanText.length > 100) {
-        return cleanText.substring(0, 100) + '...';
-      }
-      return cleanText;
+      return text.replace(/&nbsp;|<[^>]+>/g, ' ').trim();
     }
     
     return '';
@@ -84,7 +79,7 @@ export function PostCard({ post }: PostCardProps) {
             </p>
         </CardHeader>
         <CardContent className="flex-grow">
-            <p className="text-sm text-muted-foreground">{extractSummary(content)}</p>
+            <p className="text-sm text-muted-foreground line-clamp-3">{extractSummary(content)}</p>
             
             {tags && tags.length > 0 && (
                  <div className="mt-4 flex flex-wrap gap-2">
