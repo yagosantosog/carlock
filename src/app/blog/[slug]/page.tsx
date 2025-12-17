@@ -36,12 +36,14 @@ async function getPostBySlug(slug: string): Promise<Post | null> {
 }
 
 export default function PostPage({ params }: { params: { slug: string } }) {
-  const { slug } = params;
   const [post, setPost] = useState<Post | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchPost = async () => {
+      const slug = params.slug;
+      if (!slug) return;
+
       setIsLoading(true);
 
       // 1. Tentar carregar do localStorage
@@ -70,7 +72,7 @@ export default function PostPage({ params }: { params: { slug: string } }) {
     };
 
     fetchPost();
-  }, [slug]);
+  }, [params.slug]);
 
 
   if (isLoading) {
