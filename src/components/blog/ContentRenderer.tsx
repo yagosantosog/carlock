@@ -14,19 +14,26 @@ interface Block {
 }
 
 interface ContentRendererProps {
-  data: string; // JSON string from Editor.js
+  data: string | OutputData; // Pode ser JSON string ou objeto já "parsado"
 }
 
 export const ContentRenderer: React.FC<ContentRendererProps> = ({ data }) => {
   let content: OutputData;
+  
   try {
-    // Tenta fazer o parse do conteúdo. Se falhar, mostra um erro.
-    content = JSON.parse(data);
-  } catch (error) {
-    console.error("Failed to parse content JSON:", error);
-    // Se o `data` for uma string simples, exibe-a dentro de um parágrafo
+    // Verifica se `data` é uma string e precisa de parse, senão, usa diretamente.
     if (typeof data === 'string') {
-        return <p dangerouslySetInnerHTML={{ __html: data }}></p>;
+      content = JSON.parse(data);
+    } else if (typeof data === 'object' && data !== null) {
+      content = data;
+    } else {
+        throw new Error("Invalid content data type");
+    }
+  } catch (error) {
+    console.error("Failed to parse or process content:", error);
+    // Se `data` for uma string simples, exibe-a
+    if (typeof data === 'string') {
+        return <div dangerouslySetInnerHTML={{ __html: data }}></div>;
     }
     return <p>Erro ao carregar o conteúdo do post.</p>;
   }
