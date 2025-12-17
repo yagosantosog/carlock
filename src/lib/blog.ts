@@ -4,7 +4,7 @@ import type { Post, PostApiResponse } from '@/types/blog';
 const STRAPI_URL = 'https://wonderful-cat-191f5294ba.strapiapp.com/api/blog-posts';
 
 // Query que popula os campos necessários conforme a estrutura da API v5
-const API_QUERY = '?populate[author]=true&populate[coverImage]=true&populate[tags]=true&populate[seo]=true&sort=publishedAt:desc';
+const API_QUERY = '?populate=author,seo,coverImage&sort=publishedAt:desc';
 const API_URL = `${STRAPI_URL}${API_QUERY}`;
 
 /**
