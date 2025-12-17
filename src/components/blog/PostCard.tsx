@@ -30,6 +30,7 @@ export function PostCard({ post }: PostCardProps) {
   const getImageUrl = () => {
     if (coverImage?.url) {
       const url = coverImage.url;
+      // As imagens da Strapi já vêm com a URL completa, então não precisamos do prefixo
       return url.startsWith('http') ? url : `${STRAPI_URL}${url}`;
     }
     return placeholder?.imageUrl;
