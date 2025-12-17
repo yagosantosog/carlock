@@ -4,8 +4,8 @@ import type { Post, PostApiResponse } from '@/types/blog';
 const STRAPI_URL = 'https://wonderful-cat-191f5294ba.strapiapp.com/api/blog-posts';
 
 // Otimização: A query é a mesma, podemos defini-la uma vez.
-// Popula o autor, a imagem da capa, as tags e o SEO.
-const API_QUERY = '?populate[author]=true&populate[coverImage]=true&populate[tags]=true&populate[seo]=true&sort=publishedAt:desc';
+// Popula o autor, a imagem da capa e as tags.
+const API_QUERY = '?populate[author]=true&populate[coverImage]=true&populate[tags]=true&sort=publishedAt:desc';
 const API_URL = `${STRAPI_URL}${API_QUERY}`;
 
 /**
@@ -15,8 +15,8 @@ const API_URL = `${STRAPI_URL}${API_QUERY}`;
  */
 export async function getPosts(): Promise<Post[]> {
   try {
-    // Usamos 'force-cache' para aproveitar o cache do Next.js.
-    // Para revalidação, 'next: { revalidate: 3600 }' seria uma boa opção.
+    // Usamos 'no-store' para garantir que os dados estejam sempre atualizados.
+    // Para produção, 'next: { revalidate: 3600 }' seria uma boa opção.
     const res = await fetch(API_URL, { cache: 'no-store' });
 
     if (!res.ok) {
@@ -48,8 +48,6 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
   
   // Para buscar um post específico, buscamos todos e filtramos.
   // Isso é eficiente porque `getPosts` é cacheado pelo Next.js (se não usar 'no-store').
-  // Se precisássemos buscar por slug diretamente, a URL seria:
-  // const url = `${STRAPI_URL}?filters[slug][$eq]=${slug}&${API_QUERY}`;
   
   try {
     const posts = await getPosts();
