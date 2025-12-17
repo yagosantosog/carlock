@@ -11,7 +11,7 @@ const STRAPI_URL = 'https://wonderful-cat-191f5294ba.strapiapp.com';
 const API_URL_BASE = `${STRAPI_URL}/api/blog-posts`;
 
 async function getPostBySlug(slug: string): Promise<Post | null> {
-  const query = `?filters[slug][$eq]=${slug}&populate[author]=true&populate[coverImage]=true&populate[seo][populate]=ogImage&populate[tags]=true`;
+  const query = `?filters[slug][$eq]=${slug}&populate[author]=true&populate[coverImage]=true&populate[seo][populate][0]=ogImage&populate[tags]=true`;
   const url = `${API_URL_BASE}${query}`;
 
   try {
