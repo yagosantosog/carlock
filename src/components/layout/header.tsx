@@ -1,9 +1,9 @@
-
 "use client";
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { X } from "lucide-react";
@@ -12,23 +12,32 @@ import { cn } from "@/lib/utils";
 export function Header() {
   const [open, setOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const pathname = usePathname();
+
+  const isBlogPage = pathname.startsWith('/blog');
+  const isHeaderSolid = isScrolled || isBlogPage;
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
 
+    // Aplica o estado inicial se já estiver na página do blog
+    if (isBlogPage) {
+      setIsScrolled(true);
+    }
+
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [isBlogPage]);
 
   const navLinks = [
-    { href: "#features", label: "Serviços" },
-    { href: "#about", label: "Sobre" },
-    { href: "#differentials", label: "Diferenciais" },
-    { href: "#services", label: "Soluções" },
+    { href: "/#features", label: "Serviços" },
+    { href: "/#about", label: "Sobre" },
+    { href: "/#differentials", label: "Diferenciais" },
+    { href: "/#services", label: "Soluções" },
     { href: "/blog", label: "Blog" },
   ];
 
@@ -36,7 +45,7 @@ export function Header() {
     <header
       className={cn(
         "fixed top-0 z-50 w-full transition-all duration-300",
-        isScrolled
+        isHeaderSolid
           ? "border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
           : "bg-transparent border-b border-transparent"
       )}
@@ -44,7 +53,7 @@ export function Header() {
       <nav className="container mx-auto flex h-24 items-center justify-between px-4">
         <Link href="/" className="flex items-center">
           <Image
-            src={isScrolled ? "/logo.png" : "/logo_1.png"}
+            src={isHeaderSolid ? "/logo.png" : "/logo_1.png"}
             alt="CarLock Logo"
             width={200}
             height={50}
@@ -52,11 +61,14 @@ export function Header() {
           />
         </Link>
         <div className="hidden items-center gap-2 md:flex">
-          <Link href="#features" className={cn( buttonVariants({ variant: "ghost" }), isScrolled ? "text-foreground/60 hover:text-foreground/80" : "text-white/80 hover:text-white" )}>Serviços</Link>
-          <Link href="#about" className={cn( buttonVariants({ variant: "ghost" }), isScrolled ? "text-foreground/60 hover:text-foreground/80" : "text-white/80 hover:text-white" )}>Sobre</Link>
-          <Link href="#differentials" className={cn( buttonVariants({ variant: "ghost" }), isScrolled ? "text-foreground/60 hover:text-foreground/80" : "text-white/80 hover:text-white" )}>Diferenciais</Link>
-          <Link href="#services" className={cn( buttonVariants({ variant: "ghost" }), isScrolled ? "text-foreground/60 hover:text-foreground/80" : "text-white/80 hover:text-white" )}>Soluções</Link>
-          <Link href="/blog" className={cn( buttonVariants({ variant: "ghost" }), isScrolled ? "text-foreground/60 hover:text-foreground/80" : "text-white/80 hover:text-white" )}>Blog</Link>
+          {navLinks.map((link) => (
+            <Link 
+              key={link.label}
+              href={link.href} 
+              className={cn( buttonVariants({ variant: "ghost" }), isHeaderSolid ? "text-foreground/60 hover:text-foreground/80" : "text-white/80 hover:text-white" )}>
+              {link.label}
+            </Link>
+          ))}
           <Button asChild size="lg" className="transition-transform duration-300 hover:scale-105 active:scale-95 ml-4">
             <Link href="https://api.whatsapp.com/send?phone=5516993166262" target="_blank">Fale Conosco</Link>
           </Button>
@@ -68,7 +80,7 @@ export function Header() {
               variant="outline"
               className={cn(
                 "md:hidden",
-                isScrolled ? "text-foreground bg-background" : "text-white bg-transparent border-white/50 hover:bg-white/10 hover:text-white"
+                isHeaderSolid ? "text-foreground bg-background" : "text-white bg-transparent border-white/50 hover:bg-white/10 hover:text-white"
               )}
             >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-6 w-6">
@@ -99,7 +111,7 @@ export function Header() {
             </SheetHeader>
             <div className="grid gap-y-2 overflow-y-auto px-4 pt-5 pb-5">
               {navLinks.map((link) => (
-                <a
+                <Link
                   key={link.href}
                   className={buttonVariants({
                     variant: "ghost",
@@ -109,7 +121,7 @@ export function Header() {
                   onClick={() => setOpen(false)}
                 >
                   {link.label}
-                </a>
+                </Link>
               ))}
             </div>
             <div className="p-4 mt-auto border-t">
