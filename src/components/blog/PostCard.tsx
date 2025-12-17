@@ -71,7 +71,7 @@ export function PostCard({ post }: PostCardProps) {
             </div>
         )}
         <CardHeader>
-            <CardTitle className="text-xl font-bold leading-snug">
+            <CardTitle className="text-xl font-bold leading-snug line-clamp-2">
             {title}
             </CardTitle>
             <p className="text-sm text-muted-foreground pt-2">
