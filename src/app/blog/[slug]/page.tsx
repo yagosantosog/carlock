@@ -1,8 +1,9 @@
+'use client';
 
+import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import Image from 'next/image';
-import { Metadata } from 'next';
 import { Badge } from '@/components/ui/badge';
 import { ContentRenderer } from '@/components/blog/ContentRenderer';
 import { Post, PostApiResponse } from '@/types/blog';
@@ -11,7 +12,7 @@ const STRAPI_URL = 'https://wonderful-cat-191f5294ba.strapiapp.com';
 const API_URL_BASE = `${STRAPI_URL}/api/blog-posts`;
 
 async function getPostBySlug(slug: string): Promise<Post | null> {
-  const query = `?filters[slug][$eq]=${slug}&populate[author]=true&populate[coverImage]=true&populate[seo][populate][0]=ogImage&populate[tags]=true`;
+  const query = `?filters[slug][$eq]=${slug}&populate[author]=true&populate[coverImage]=true&populate[seo][populate][ogImage]=true&populate[tags]=true`;
   const url = `${API_URL_BASE}${query}`;
 
   try {
@@ -34,50 +35,46 @@ async function getPostBySlug(slug: string): Promise<Post | null> {
   }
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const post = await getPostBySlug(params.slug);
+export default function PostPage({ params }: { params: { slug: string } }) {
+  const [post, setPost] = useState<Post | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  if (!post) {
-    return {
-      title: "Post não encontrado",
-      description: "O post que você está procurando não existe ou foi movido."
+  useEffect(() => {
+    const fetchPost = async () => {
+      setIsLoading(true);
+
+      // 1. Tentar carregar do localStorage
+      try {
+        const cachedPost = localStorage.getItem(`post-${params.slug}`);
+        if (cachedPost) {
+          const parsedPost = JSON.parse(cachedPost);
+          setPost(parsedPost);
+          setIsLoading(false);
+          console.log("Post carregado do localStorage.");
+          return;
+        }
+      } catch (e) {
+        console.error("Erro ao carregar post do localStorage, buscando na API.", e);
+      }
+      
+      // 2. Se não estiver no cache, buscar na API
+      console.log("Nenhum cache encontrado, buscando post na API...");
+      const fetchedPost = await getPostBySlug(params.slug);
+      
+      if(fetchedPost) {
+        setPost(fetchedPost);
+      }
+      
+      setIsLoading(false);
     };
+
+    fetchPost();
+  }, [params.slug]);
+
+
+  if (isLoading) {
+    return <div className="container mx-auto py-10 px-4 text-center">Carregando post...</div>;
   }
-
-  const metaTitle = post.seo?.metaTitle || post.title;
-  const metaDescription = post.seo?.metaDescription || '';
-  
-  const ogImageUrl = post.seo?.ogImage?.url 
-    ? (post.seo.ogImage.url.startsWith('http') ? post.seo.ogImage.url : `${STRAPI_URL}${post.seo.ogImage.url}`)
-    : (post.coverImage?.url ? (post.coverImage.url.startsWith('http') ? post.coverImage.url : `${STRAPI_URL}${post.coverImage.url}`) : undefined);
-
-  return {
-    title: metaTitle,
-    description: metaDescription,
-    openGraph: {
-      title: metaTitle,
-      description: metaDescription,
-      images: ogImageUrl ? [ogImageUrl] : [],
-    },
-  };
-}
-
-export async function generateStaticParams() {
-  try {
-    const res = await fetch(`${API_URL_BASE}?fields[0]=slug`);
-    if (!res.ok) return [];
-
-    const { data } = await res.json() as PostApiResponse;
-    return data.map((post) => ({
-      slug: post.slug,
-    }));
-  } catch {
-    return [];
-  }
-}
-
-export default async function PostPage({ params }: { params: { slug: string } }) {
-  const post = await getPostBySlug(params.slug);
 
   if (!post) {
     return <div className="container mx-auto py-10 text-center">Post não encontrado.</div>;

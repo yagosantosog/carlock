@@ -3,8 +3,6 @@ import Image from 'next/image';
 import { Post } from '@/types/blog';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import { Badge } from '../ui/badge';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { PostDate } from './PostDate';
@@ -29,6 +27,7 @@ export function PostCard({ post }: PostCardProps) {
   const getImageUrl = () => {
     if (coverImage?.url) {
       const url = coverImage.url;
+      // As imagens da Strapi podem ter um URL relativo ou absoluto
       return url.startsWith('http') ? url : `${STRAPI_URL}${url}`;
     }
     return placeholder?.imageUrl;
@@ -42,7 +41,7 @@ export function PostCard({ post }: PostCardProps) {
   const extractSummary = (content: any): string => {
     if (!content) return '';
     try {
-      // Handle JSON string from Editor.js
+      // Tenta parsear JSON do Editor.js
       const parsed = typeof content === 'string' ? JSON.parse(content) : content;
       if (parsed && Array.isArray(parsed.blocks)) {
         const firstParagraph = parsed.blocks.find((block: any) => block.type === 'paragraph');
@@ -52,7 +51,7 @@ export function PostCard({ post }: PostCardProps) {
         }
       }
     } catch (error) {
-       // Handle plain string content
+       // Se falhar o parse, trata como string simples
        if (typeof content === 'string') {
          const text = String(content).replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim();
          return text.substring(0, 100) + (text.length > 100 ? '...' : '');
@@ -61,42 +60,54 @@ export function PostCard({ post }: PostCardProps) {
     return '';
   };
 
+  const handleReadMoreClick = () => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(`post-${slug}`, JSON.stringify(post));
+      } catch (error) {
+        console.error("Failed to save post to localStorage", error);
+      }
+    }
+  };
+
   return (
-    <Link href={postUrl} className="group">
-      <Card className="flex flex-col h-full overflow-hidden transition-shadow duration-300 hover:shadow-lg">
-        {imageUrl && (
-          <div className="relative w-full h-48">
-            <Image
-              src={imageUrl}
-              alt={imageAlt}
-              fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
-            />
-          </div>
-        )}
-        <CardHeader>
-          <CardTitle className="text-xl font-bold leading-snug">
-            {title}
-          </CardTitle>
-          <p className="text-sm text-muted-foreground pt-2">
-            <PostDate dateString={publishedAt} /> por {authorName}
-          </p>
-        </CardHeader>
-        <CardContent className="flex-grow">
-          <p className="text-sm text-muted-foreground">{extractSummary(content)}</p>
-          
-          <div className="mt-4 flex flex-wrap gap-2">
-            {tags && Array.isArray(tags) && tags.map((tag, index) => (
-              <Badge key={index} variant="secondary">{tag.name}</Badge>
-            ))}
-          </div>
-        </CardContent>
-        <CardFooter className="mt-auto">
-            <Button asChild variant="default" className="w-full">
-              <span aria-hidden="true">Ler Mais</span>
-            </Button>
-        </CardFooter>
-      </Card>
-    </Link>
+    <div onClick={handleReadMoreClick} className="h-full">
+      <Link href={postUrl} className="group h-full flex">
+        <Card className="flex flex-col h-full w-full overflow-hidden transition-shadow duration-300 hover:shadow-lg">
+          {imageUrl && (
+            <div className="relative w-full h-48">
+              <Image
+                src={imageUrl}
+                alt={imageAlt}
+                fill
+                className="object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+            </div>
+          )}
+          <CardHeader>
+            <CardTitle className="text-xl font-bold leading-snug">
+              {title}
+            </CardTitle>
+            <p className="text-sm text-muted-foreground pt-2">
+              <PostDate dateString={publishedAt} /> por {authorName}
+            </p>
+          </CardHeader>
+          <CardContent className="flex-grow">
+            <p className="text-sm text-muted-foreground">{extractSummary(content)}</p>
+            
+            <div className="mt-4 flex flex-wrap gap-2">
+              {tags && tags.length > 0 && tags.map((tag, index) => (
+                <Badge key={index} variant="secondary">{tag.name}</Badge>
+              ))}
+            </div>
+          </CardContent>
+          <CardFooter className="mt-auto">
+              <Button asChild variant="default" className="w-full">
+                <span aria-hidden="true">Ler Mais</span>
+              </Button>
+          </CardFooter>
+        </Card>
+      </Link>
+    </div>
   );
 }
