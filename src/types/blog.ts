@@ -1,31 +1,36 @@
 
+// A estrutura `attributes` foi removida, pois a API v5 retorna um formato "achatado".
+
 export interface StrapiImage {
+  id: number;
   url: string;
-  alternativeText?: string | null;
+  alternativeText: string | null;
 }
 
 export interface StrapiAuthor {
+  id: number;
   name: string;
+  bio: string | null;
 }
 
 export interface SeoData {
-  metaTitle?: string;
-  metaDescription?: string;
-  ogImage?: StrapiImage;
+  id: number;
+  metaTitle: string | null;
+  metaDescription: string | null;
+  ogImage?: StrapiImage | null; // Adicionado para consistência, embora a URL principal seja a coverImage
 }
 
 export interface Post {
   id: number;
-  documentId: string;
   title: string;
   slug: string;
-  content: any; // JSON string from Editor.js
+  content: { type: string; children: { type: string; text: string }[] }[]; // Array de blocos Rich Text
   publishedAt: string;
   createdAt: string;
   updatedAt: string;
-  coverImage?: StrapiImage;
-  author?: StrapiAuthor;
-  seo?: SeoData;
+  coverImage: StrapiImage | null;
+  author: StrapiAuthor | null;
+  seo: SeoData | null;
   tags?: { name: string }[];
 }
 

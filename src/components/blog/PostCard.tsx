@@ -1,17 +1,42 @@
+
 import Link from 'next/link';
 import Image from 'next/image';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+
 import { Post } from '@/types/blog';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '../ui/badge';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { PostDate } from './PostDate';
 
 interface PostCardProps {
   post: Post;
 }
 
 const STRAPI_URL = 'https://wonderful-cat-191f5294ba.strapiapp.com';
+
+// Função para extrair um resumo simples do conteúdo
+const extractSummary = (content: Post['content']): string => {
+    if (!content || !Array.isArray(content)) return '';
+    
+    // Encontra o primeiro bloco do tipo "paragraph"
+    const firstParagraph = content.find(block => block.type === 'paragraph');
+    
+    if (firstParagraph && Array.isArray(firstParagraph.children)) {
+      // Concatena o texto de todos os filhos do parágrafo
+      const text = firstParagraph.children.map(child => child.text).join(' ');
+      const cleanText = text.replace(/&nbsp;|<[^>]+>/g, ' ').trim();
+      
+      if (cleanText.length > 100) {
+        return cleanText.substring(0, 100) + '...';
+      }
+      return cleanText;
+    }
+    
+    return '';
+};
+
 
 export function PostCard({ post }: PostCardProps) {
   const placeholder = PlaceHolderImages.find(p => p.id === 'blog-post-placeholder');
@@ -24,90 +49,56 @@ export function PostCard({ post }: PostCardProps) {
 
   const postUrl = `/blog/${slug}`;
 
+  // Constrói a URL da imagem, tratando URLs relativas e absolutas
   const getImageUrl = () => {
     if (coverImage?.url) {
-      const url = coverImage.url;
-      // As imagens da Strapi podem ter um URL relativo ou absoluto
-      return url.startsWith('http') ? url : `${STRAPI_URL}${url}`;
+      return coverImage.url.startsWith('http') ? coverImage.url : `${STRAPI_URL}${coverImage.url}`;
     }
-    return placeholder?.imageUrl;
+    return placeholder?.imageUrl; // Fallback para placeholder
   };
   
   const imageUrl = getImageUrl();
   const imageAlt = coverImage?.alternativeText || title;
-  
   const authorName = author?.name || 'Autor Desconhecido';
-  
-  const extractSummary = (content: any): string => {
-    if (!content) return '';
-    try {
-      // Tenta parsear JSON do Editor.js
-      const parsed = typeof content === 'string' ? JSON.parse(content) : content;
-      if (parsed && Array.isArray(parsed.blocks)) {
-        const firstParagraph = parsed.blocks.find((block: any) => block.type === 'paragraph');
-        if (firstParagraph) {
-          const text = firstParagraph.data.text.replace(/&nbsp;|<[^>]+>/g, ' ').trim();
-          return text.substring(0, 100) + (text.length > 100 ? '...' : '');
-        }
-      }
-    } catch (error) {
-       // Se falhar o parse, trata como string simples
-       if (typeof content === 'string') {
-         const text = String(content).replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim();
-         return text.substring(0, 100) + (text.length > 100 ? '...' : '');
-       }
-    }
-    return '';
-  };
-
-  const handleReadMoreClick = () => {
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.setItem(`post-${slug}`, JSON.stringify(post));
-      } catch (error) {
-        console.error("Failed to save post to localStorage", error);
-      }
-    }
-  };
+  const formattedDate = publishedAt ? format(new Date(publishedAt), "dd 'de' MMMM, yyyy", { locale: ptBR }) : '';
 
   return (
-    <div onClick={handleReadMoreClick} className="h-full">
-      <Link href={postUrl} className="group h-full flex">
+    <Link href={postUrl} className="group h-full flex" prefetch={true}>
         <Card className="flex flex-col h-full w-full overflow-hidden transition-shadow duration-300 hover:shadow-lg">
-          {imageUrl && (
+        {imageUrl && (
             <div className="relative w-full h-48">
-              <Image
+            <Image
                 src={imageUrl}
                 alt={imageAlt}
                 fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
-              />
+            />
             </div>
-          )}
-          <CardHeader>
+        )}
+        <CardHeader>
             <CardTitle className="text-xl font-bold leading-snug">
-              {title}
+            {title}
             </CardTitle>
             <p className="text-sm text-muted-foreground pt-2">
-              <PostDate dateString={publishedAt} /> por {authorName}
+                {formattedDate} por {authorName}
             </p>
-          </CardHeader>
-          <CardContent className="flex-grow">
+        </CardHeader>
+        <CardContent className="flex-grow">
             <p className="text-sm text-muted-foreground">{extractSummary(content)}</p>
             
             <div className="mt-4 flex flex-wrap gap-2">
-              {tags && tags.length > 0 && tags.map((tag, index) => (
+            {tags && tags.length > 0 && tags.slice(0, 3).map((tag, index) => (
                 <Badge key={index} variant="secondary">{tag.name}</Badge>
-              ))}
+            ))}
             </div>
-          </CardContent>
-          <CardFooter className="mt-auto">
-              <Button asChild variant="default" className="w-full">
-                <span aria-hidden="true">Ler Mais</span>
-              </Button>
-          </CardFooter>
+        </CardContent>
+        <CardFooter className="mt-auto">
+            <div className="w-full text-primary font-semibold group-hover:underline">
+                Ler Mais &rarr;
+            </div>
+        </CardFooter>
         </Card>
-      </Link>
-    </div>
+    </Link>
   );
 }
