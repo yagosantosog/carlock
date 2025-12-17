@@ -36,6 +36,7 @@ async function getPostBySlug(slug: string): Promise<Post | null> {
 }
 
 export default function PostPage({ params }: { params: { slug: string } }) {
+  const { slug } = params;
   const [post, setPost] = useState<Post | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -45,7 +46,7 @@ export default function PostPage({ params }: { params: { slug: string } }) {
 
       // 1. Tentar carregar do localStorage
       try {
-        const cachedPost = localStorage.getItem(`post-${params.slug}`);
+        const cachedPost = localStorage.getItem(`post-${slug}`);
         if (cachedPost) {
           const parsedPost = JSON.parse(cachedPost);
           setPost(parsedPost);
@@ -59,7 +60,7 @@ export default function PostPage({ params }: { params: { slug: string } }) {
       
       // 2. Se não estiver no cache, buscar na API
       console.log("Nenhum cache encontrado, buscando post na API...");
-      const fetchedPost = await getPostBySlug(params.slug);
+      const fetchedPost = await getPostBySlug(slug);
       
       if(fetchedPost) {
         setPost(fetchedPost);
@@ -69,7 +70,7 @@ export default function PostPage({ params }: { params: { slug: string } }) {
     };
 
     fetchPost();
-  }, [params.slug]);
+  }, [slug]);
 
 
   if (isLoading) {
