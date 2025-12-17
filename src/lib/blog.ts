@@ -4,8 +4,8 @@ import type { Post, PostApiResponse } from '@/types/blog';
 const STRAPI_URL = 'https://wonderful-cat-191f5294ba.strapiapp.com/api/blog-posts';
 
 // Otimização: A query é a mesma, podemos defini-la uma vez.
-// Popula o autor, a imagem da capa e as tags.
-const API_QUERY = '?populate[author]=true&populate[coverImage]=true&populate[tags]=true&sort=publishedAt:desc';
+// Popula o autor, a imagem da capa, as tags e o SEO.
+const API_QUERY = '?populate[author]=true&populate[coverImage]=true&populate[tags]=true&populate[seo]=true&sort=publishedAt:desc';
 const API_URL = `${STRAPI_URL}${API_QUERY}`;
 
 /**
