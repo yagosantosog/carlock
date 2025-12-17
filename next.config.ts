@@ -34,6 +34,12 @@ const nextConfig: NextConfig = {
         hostname: 'wonderful-cat-191f5294ba.media.strapiapp.com',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'efficient-nature-699917a2c3.media.strapiapp.com',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
