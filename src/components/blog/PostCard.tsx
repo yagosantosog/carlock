@@ -13,7 +13,7 @@ interface PostCardProps {
   post: Post;
 }
 
-const STRAPI_URL = 'https://wonderful-cat-191f5294ba.strapiapp.com';
+const STRAPI_URL = 'https://efficient-nature-699917a2c3.strapiapp.com';
 
 // Função para extrair um resumo simples do conteúdo
 const extractSummary = (content: Post['content']): string => {

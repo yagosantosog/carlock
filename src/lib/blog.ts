@@ -1,6 +1,6 @@
 import type { Post, PostApiResponse } from '@/types/blog';
 
-const STRAPI_URL = 'https://wonderful-cat-191f5294ba.strapiapp.com/api/blog-posts';
+const STRAPI_URL = 'https://efficient-nature-699917a2c3.strapiapp.com/api/blog-posts';
 
 // Query correta para Strapi v5
 const POPULATE_QUERY =

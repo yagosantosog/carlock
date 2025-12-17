@@ -9,7 +9,7 @@ import { getPostBySlug, getPosts } from '@/lib/blog';
 import { ContentRenderer } from '@/components/blog/ContentRenderer';
 import { Badge } from '@/components/ui/badge';
 
-const STRAPI_URL = 'https://wonderful-cat-191f5294ba.strapiapp.com';
+const STRAPI_URL = 'https://efficient-nature-699917a2c3.strapiapp.com';
 
 type Props = {
   params: { slug: string };
