@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Badge } from '../ui/badge';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { PostDate } from './PostDate';
 
 interface PostCardProps {
   post: Post;
@@ -52,8 +53,10 @@ export function PostCard({ post }: PostCardProps) {
       }
     } catch (error) {
        // Handle plain string content
-       const text = String(content).replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim();
-       return text.substring(0, 100) + (text.length > 100 ? '...' : '');
+       if (typeof content === 'string') {
+         const text = String(content).replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim();
+         return text.substring(0, 100) + (text.length > 100 ? '...' : '');
+       }
     }
     return '';
   };
@@ -76,7 +79,7 @@ export function PostCard({ post }: PostCardProps) {
             {title}
           </CardTitle>
           <p className="text-sm text-muted-foreground pt-2">
-            {publishedAt ? format(new Date(publishedAt), "dd 'de' MMMM, yyyy", { locale: ptBR }) : ''} por {authorName}
+            <PostDate dateString={publishedAt} /> por {authorName}
           </p>
         </CardHeader>
         <CardContent className="flex-grow">
