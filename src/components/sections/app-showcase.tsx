@@ -3,7 +3,6 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Check } from "lucide-react";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 const highlights = [
     "Localização em Tempo Real",
@@ -13,12 +12,6 @@ const highlights = [
 ];
 
 export function AppShowcase() {
-    const appImage = PlaceHolderImages.find((img) => img.id === "app-showcase-person");
-
-    if (!appImage) {
-        return null;
-    }
-
     return (
         <section id="app-showcase" className="py-16 sm:py-24 bg-background">
             <div className="container mx-auto px-4">
@@ -27,11 +20,11 @@ export function AppShowcase() {
                     <div className="flex justify-center p-8">
                         <div className="relative aspect-[3/4] w-full max-w-sm rounded-lg overflow-hidden shadow-2xl transition-all duration-300 hover:scale-105">
                             <Image
-                                src={appImage.imageUrl}
-                                alt={appImage.description}
+                                src="/celular.png"
+                                alt="Aplicativo CarLock em um celular"
                                 fill
-                                className="object-cover"
-                                data-ai-hint={appImage.imageHint}
+                                className="object-contain"
+                                data-ai-hint="app screenshot"
                             />
                         </div>
                     </div>
