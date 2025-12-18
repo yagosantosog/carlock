@@ -23,7 +23,7 @@ export function AppShowcase() {
                                 src="/celular.png"
                                 alt="Aplicativo CarLock em um celular"
                                 fill
-                                className="object-contain"
+                                className="object-cover"
                                 data-ai-hint="app screenshot"
                             />
                         </div>
