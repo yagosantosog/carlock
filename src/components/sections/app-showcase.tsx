@@ -20,7 +20,7 @@ export function AppShowcase() {
                     <div className="flex justify-center p-8">
                         <div className="relative aspect-[3/4] w-full max-w-sm rounded-lg overflow-hidden shadow-2xl transition-all duration-300 hover:scale-105">
                             <Image
-                                src="/celular.png"
+                                src="/carlock-celular.png"
                                 alt="Aplicativo CarLock em um celular"
                                 fill
                                 className="object-cover"
