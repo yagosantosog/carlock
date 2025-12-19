@@ -56,8 +56,8 @@ export function Footer() {
       <div className="container mx-auto px-4 py-16 sm:py-24">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
             <div className="col-span-1 md:col-span-2 lg:col-span-2 mb-8 lg:mb-0">
-               <Link href="/" className="flex items-center gap-2">
-                  <Image src="/logo_1.png" alt="CarLock Logo" width={160} height={40} />
+               <Link href="/" className="flex items-center gap-2 flex-shrink-0">
+                  <Image src="/logo_1.png" alt="CarLock Logo" width={160} height={40} style={{height: "auto"}} />
                </Link>
               <p className="mt-4 text-sm text-muted-foreground text-justify">
               Com base em Franca-SP, somos uma empresa de sistema de rastreamento veicular com vasta experiência no mercado. Oferecemos segurança com alta tecnologia e um atendimento ágil. Nossa loja é 100% virtual, o que nos permite atender clientes em todo o território nacional com a mesma eficiência.
