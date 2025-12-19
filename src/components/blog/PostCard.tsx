@@ -8,6 +8,20 @@ import { Post } from '@/types/blog';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '../ui/badge';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { useToast } from '../ui/use-toast';
+
+// Temporary simplified Post type
+interface Post {
+  id: string | number;
+  title: string;
+  slug: string;
+  author: string;
+  createdAt: string;
+  coverImage?: { url: string };
+  tags?: string[];
+  content?: any;
+}
+
 
 interface PostCardProps {
   post: Post;
