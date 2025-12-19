@@ -48,9 +48,23 @@ export function Features() {
   return (
     <section id="features" className="py-16 sm:py-24 bg-white">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className="flex flex-col lg:flex-row items-center justify-center gap-12">
+          {/* Image Column */}
+          <div className="w-full lg:w-5/12 flex justify-center lg:justify-start">
+            <div className="relative aspect-square w-full max-w-md rounded-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
+              {featuresImage && (
+                <Image
+                  src={featuresImage.imageUrl}
+                  alt={featuresImage.description}
+                  fill
+                  className="object-cover"
+                  data-ai-hint={featuresImage.imageHint}
+                />
+              )}
+            </div>
+          </div>
           {/* Content Column */}
-          <div className="lg:order-last">
+          <div className="w-full lg:w-7/12">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl font-headline relative pb-4 text-center lg:text-left">
               Tudo que você precisa para sua segurança
               <span className="absolute bottom-0 left-1/2 lg:left-0 -translate-x-1/2 lg:translate-x-0 h-1 w-20 bg-primary"></span>
@@ -70,20 +84,6 @@ export function Features() {
                   </div>
                 </div>
               ))}
-            </div>
-          </div>
-          {/* Image Column */}
-          <div className="flex justify-center p-8 lg:order-first">
-            <div className="relative aspect-square w-full max-w-md rounded-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
-              {featuresImage && (
-                <Image
-                  src={featuresImage.imageUrl}
-                  alt={featuresImage.description}
-                  fill
-                  className="object-cover"
-                  data-ai-hint={featuresImage.imageHint}
-                />
-              )}
             </div>
           </div>
         </div>
